@@ -1,968 +1,3547 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Entrega 4 — i-Homotic · Canvas + Transmedia</title>
-<link href="https://fonts.googleapis.com/css2?family=Righteous&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrega 4 — i-Homotic · Canvas + Transmedia</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Righteous&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      /* Paleta Global.css de i-Homotic */
+      --fondo-claro: #F0F0F5;
+      --primario: #9BC462;
+      /* verde — B2C, acción, vegetal */
+      --primario-d: #7DA84E;
+      --primario-l: #B8D788;
+      --primario-wash: #EAF3D8;
+      --texto-oscuro: #081C35;
+      /* navy profundo */
+      --secundario: #7B5AA2;
+      /* púrpura — B2B, prestigio */
+      --secundario-d: #5F4480;
+      --secundario-l: #9C7BC0;
+      --secundario-wash: #E8E1F0;
+      --blanco: #FFFFFF;
+      --whatsapp: #25D366;
+      --whatsapp-d: #128C7E;
+      --fondo-mapa: #151A2A;
+      /* navy oscuro fondo */
+      --texto-mapa: #F9FBF8;
+      --tarjeta-1: #0D1B2A;
+      --tarjeta-2: #1B263B;
+      --tarjeta-borde: #2C2F57;
+      --footer-bg: #E2E2E4;
+      --footer-text: #41424D;
+      --cloud: #D8D8DD;
+      --fog: #6B7280;
+      --acento: #9BC462;
+      --sidebar-w: 320px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      background: var(--fondo-mapa);
+      color: var(--blanco);
+      overflow-x: hidden;
+    }
+
+    /* ═══ SLIDES ═══ */
+    .s {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 80px;
+      overflow: hidden;
+    }
+
+    @media(max-width:800px) {
+      .s {
+        padding: 36px 22px;
+      }
+    }
+
+    /* Nav dots */
+    .nav {
+      position: fixed;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      z-index: 300;
+    }
+
+    .dt {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all .3s;
+      background: rgba(255, 255, 255, .1);
+      border: 1.5px solid rgba(255, 255, 255, .2);
+    }
+
+    .dt:hover,
+    .dt.on {
+      background: var(--primario);
+      border-color: var(--primario);
+      box-shadow: 0 0 10px rgba(155, 196, 98, .5);
+      transform: scale(1.4);
+    }
+
+    /* ═══ SIDEBAR ═══ */
+    .sidebar-toggle {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 500;
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(155, 196, 98, .85);
+      backdrop-filter: blur(8px);
+      color: var(--texto-oscuro);
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .25s;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .3);
+      font-weight: 700;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--primario);
+      transform: scale(1.05);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: rgba(13, 27, 42, .97);
+      backdrop-filter: blur(16px);
+      z-index: 450;
+      transform: translateX(-100%);
+      transition: transform .35s cubic-bezier(.4, 0, .2, 1);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-header {
+      padding: 22px 22px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .sidebar-header h3 {
+      font-family: 'Righteous', sans-serif;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--primario);
+      letter-spacing: 1px;
+    }
+
+    .sidebar-close {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, .4);
+      font-size: 22px;
+      cursor: pointer;
+      padding: 4px;
+      transition: color .2s;
+    }
+
+    .sidebar-close:hover {
+      color: var(--blanco);
+    }
+
+    .sidebar-list {
+      list-style: none;
+      padding: 10px 0;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .sidebar-list li {
+      border-bottom: 1px solid rgba(255, 255, 255, .04);
+    }
+
+    .sidebar-list a {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 22px;
+      text-decoration: none;
+      color: rgba(255, 255, 255, .55);
+      transition: all .2s;
+      font-size: 13.5px;
+      line-height: 1.4;
+    }
+
+    .sidebar-list a:hover {
+      background: rgba(155, 196, 98, .08);
+      color: var(--blanco);
+    }
+
+    .sidebar-list a.active {
+      background: rgba(155, 196, 98, .12);
+      color: var(--primario);
+    }
+
+    .sidebar-list .sb-num {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--secundario-l);
+      min-width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 7px;
+      background: rgba(123, 90, 162, .15);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .sidebar-list .sb-txt {
+      font-weight: 500;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      z-index: 440;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+
+    .sidebar-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Print 16:9 */
+    @media print {
+
+      .sidebar,
+      .sidebar-toggle,
+      .sidebar-overlay,
+      .nav,
+      .scroll-h,
+      .export-btn {
+        display: none !important;
+      }
+
+      html {
+        scroll-snap-type: none !important;
+      }
+
+      body {
+        background: white;
+      }
+
+      .s {
+        min-height: auto !important;
+        height: auto !important;
+        width: 100% !important;
+        aspect-ratio: 16/9;
+        page-break-after: always;
+        page-break-inside: avoid;
+        break-after: page;
+        break-inside: avoid;
+        padding: 48px 64px !important;
+        overflow: hidden !important;
+      }
+
+      .s:last-child {
+        page-break-after: auto;
+      }
+
+      .an {
+        opacity: 1 !important;
+        animation: none !important;
+      }
+
+      @page {
+        size: landscape;
+        margin: 0;
+      }
+    }
+
+    /* ═══ TEMAS ═══ */
+    .s.dk {
+      background: var(--fondo-mapa);
+      color: var(--blanco);
+    }
+
+    .s.lt {
+      background: var(--fondo-claro);
+      color: var(--texto-oscuro);
+    }
+
+    .s.gr {
+      background: var(--primario-d);
+      color: var(--blanco);
+    }
+
+    .s.pr {
+      background: var(--secundario);
+      color: var(--blanco);
+    }
+
+    .s.nv {
+      background: var(--texto-oscuro);
+      color: var(--blanco);
+    }
+
+    /* Fondos decorativos */
+    .bg-p {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .04;
+      background-image: radial-gradient(circle, currentColor 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(110px);
+      pointer-events: none;
+    }
+
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: linear-gradient(rgba(255, 255, 255, .5) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .5) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* ═══ TIPOGRAFÍA ═══ */
+    .lbl {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .s.dk .lbl,
+    .s.nv .lbl {
+      color: var(--primario);
+    }
+
+    .s.lt .lbl {
+      color: var(--secundario);
+    }
+
+    .s.gr .lbl,
+    .s.pr .lbl {
+      color: rgba(255, 255, 255, .7);
+    }
+
+    .lbl .pip {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--secundario-l);
+    }
+
+    .s.gr .lbl .pip,
+    .s.pr .lbl .pip {
+      background: var(--blanco);
+    }
+
+    .s.lt .lbl .pip {
+      background: var(--primario);
+    }
+
+    .tt {
+      font-family: 'Righteous', sans-serif;
+      font-weight: 400;
+      line-height: 1.15;
+      margin-bottom: 18px;
+      font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+      letter-spacing: .5px;
+    }
+
+    .tt em {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      font-style: italic;
+    }
+
+    .s.dk .tt .hi,
+    .s.nv .tt .hi {
+      color: var(--primario);
+    }
+
+    .s.lt .tt .hi {
+      color: var(--secundario);
+    }
+
+    .s.gr .tt .hi,
+    .s.pr .tt .hi {
+      color: var(--blanco);
+      text-decoration: underline;
+      text-decoration-color: rgba(255, 255, 255, .4);
+      text-underline-offset: 6px;
+    }
+
+    .sub {
+      font-size: clamp(0.98rem, 1.4vw, 1.1rem);
+      font-weight: 400;
+      line-height: 1.7;
+      max-width: 820px;
+    }
+
+    .s.dk .sub,
+    .s.nv .sub {
+      color: rgba(255, 255, 255, .6);
+    }
+
+    .s.lt .sub {
+      color: var(--fog);
+    }
+
+    .s.gr .sub,
+    .s.pr .sub {
+      color: rgba(255, 255, 255, .78);
+    }
+
+    /* ═══ CARDS ═══ */
+    .card {
+      border-radius: 14px;
+      padding: 20px;
+      transition: all .25s;
+      border: 1px solid transparent;
+    }
+
+    .card.c-dark {
+      background: var(--tarjeta-1);
+      color: var(--blanco);
+      border-color: var(--tarjeta-borde);
+    }
+
+    .card.c-dark p {
+      color: rgba(255, 255, 255, .62);
+    }
+
+    .card.c-dark:hover {
+      border-color: var(--primario);
+      transform: translateY(-2px);
+    }
+
+    .card.c-darker {
+      background: var(--tarjeta-2);
+      color: var(--blanco);
+      border-color: var(--tarjeta-borde);
+    }
+
+    .card.c-darker p {
+      color: rgba(255, 255, 255, .65);
+    }
+
+    .card.c-white {
+      background: var(--blanco);
+      color: var(--texto-oscuro);
+      border-color: var(--cloud);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+    }
+
+    .card.c-white p {
+      color: var(--fog);
+    }
+
+    .card.c-white:hover {
+      box-shadow: 0 8px 24px rgba(8, 28, 53, .1);
+      transform: translateY(-2px);
+    }
+
+    .card.c-green {
+      background: var(--primario-d);
+      color: var(--blanco);
+    }
+
+    .card.c-green p {
+      color: rgba(255, 255, 255, .85);
+    }
+
+    .card.c-purple {
+      background: var(--secundario);
+      color: var(--blanco);
+    }
+
+    .card.c-purple p {
+      color: rgba(255, 255, 255, .85);
+    }
+
+    .card.c-green-wash {
+      background: var(--primario-wash);
+      color: var(--texto-oscuro);
+      border-color: #CBE0A6;
+    }
+
+    .card.c-green-wash p {
+      color: #3D5230;
+    }
+
+    .card.c-purple-wash {
+      background: var(--secundario-wash);
+      color: var(--texto-oscuro);
+      border-color: #CDBADC;
+    }
+
+    .card.c-purple-wash p {
+      color: #4A3960;
+    }
+
+    .card-icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+      line-height: 1;
+    }
+
+    .card h4 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 15.5px;
+      font-weight: 700;
+      margin-bottom: 7px;
+      letter-spacing: .2px;
+      line-height: 1.3;
+    }
+
+    .card p {
+      font-size: 13.5px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .card .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      padding: 3px 8px;
+      border-radius: 5px;
+      background: rgba(155, 196, 98, .15);
+      color: var(--primario);
+    }
+
+    .card.c-purple .tag,
+    .card.c-purple-wash .tag {
+      background: rgba(123, 90, 162, .18);
+      color: var(--secundario);
+    }
+
+    .card.c-purple .tag {
+      background: rgba(255, 255, 255, .18);
+      color: var(--blanco);
+    }
+
+    .card.c-green .tag {
+      background: rgba(255, 255, 255, .18);
+      color: var(--blanco);
+    }
+
+    /* Grids */
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .g3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .g4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .g5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    @media(max-width:860px) {
+
+      .g2,
+      .g3,
+      .g4,
+      .g5 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .fc {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .fc>.card {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    /* Statement blocks */
+    .stmt {
+      font-size: clamp(1rem, 1.5vw, 1.15rem);
+      font-weight: 400;
+      line-height: 1.75;
+      max-width: 880px;
+      padding: 24px 28px;
+      border-radius: 14px;
+    }
+
+    .stmt.st-green {
+      background: var(--primario-d);
+      color: var(--blanco);
+      border-left: 5px solid var(--secundario-l);
+    }
+
+    .stmt.st-purple {
+      background: var(--secundario);
+      color: var(--blanco);
+      border-left: 5px solid var(--primario);
+    }
+
+    .stmt.st-dark {
+      background: var(--tarjeta-1);
+      color: var(--blanco);
+      border-left: 5px solid var(--primario);
+      border: 1px solid var(--tarjeta-borde);
+      border-left: 5px solid var(--primario);
+    }
+
+    .stmt strong {
+      font-weight: 700;
+      color: var(--primario-l);
+    }
+
+    .stmt.st-purple strong {
+      color: var(--blanco);
+      text-decoration: underline;
+      text-decoration-color: rgba(255, 255, 255, .35);
+      text-underline-offset: 3px;
+    }
+
+    .stmt.st-dark strong {
+      color: var(--primario);
+    }
+
+    /* Chips */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 3px;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .chip.cg {
+      background: var(--primario-d);
+      color: var(--blanco);
+    }
+
+    .chip.cp {
+      background: var(--secundario);
+      color: var(--blanco);
+    }
+
+    .chip.cg-o {
+      background: var(--primario-wash);
+      color: var(--primario-d);
+      border: 1px solid #CBE0A6;
+    }
+
+    .chip.cp-o {
+      background: var(--secundario-wash);
+      color: var(--secundario-d);
+      border: 1px solid #CDBADC;
+    }
+
+    .chip.cd {
+      background: rgba(255, 255, 255, .08);
+      color: var(--blanco);
+      border: 1px solid rgba(255, 255, 255, .15);
+    }
+
+    /* Bullets */
+    .bi {
+      display: flex;
+      align-items: baseline;
+      gap: 11px;
+      padding: 9px 0;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .bi+.bi {
+      border-top: 1px solid rgba(255, 255, 255, .07);
+    }
+
+    .s.lt .bi+.bi {
+      border-top: 1px solid rgba(8, 28, 53, .08);
+    }
+
+    .bi .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 6px;
+      background: var(--primario);
+    }
+
+    .bi .dot.dp {
+      background: var(--secundario-l);
+    }
+
+    .bi .dot.dw {
+      background: var(--whatsapp);
+    }
+
+    .bi strong {
+      font-weight: 700;
+      color: var(--primario-l);
+    }
+
+    .s.lt .bi strong {
+      color: var(--secundario);
+    }
+
+    /* Tabla embudo */
+    .fnl {
+      display: grid;
+      grid-template-columns: 130px 1fr 1fr;
+      gap: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--tarjeta-borde);
+    }
+
+    .fnl-h {
+      background: var(--tarjeta-2);
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--primario);
+      border-bottom: 1px solid var(--tarjeta-borde);
+    }
+
+    .fnl-row {
+      display: contents;
+    }
+
+    .fnl-row>div {
+      padding: 14px 16px;
+      background: var(--tarjeta-1);
+      border-bottom: 1px solid var(--tarjeta-borde);
+      font-size: 13px;
+      line-height: 1.55;
+      color: rgba(255, 255, 255, .78);
+    }
+
+    .fnl-row:last-child>div {
+      border-bottom: none;
+    }
+
+    .fnl-row .stage {
+      font-family: 'Righteous', sans-serif;
+      font-size: 14px;
+      color: var(--blanco);
+      letter-spacing: .5px;
+      background: var(--tarjeta-2);
+      font-weight: 400;
+    }
+
+    .fnl-row .stage .pct {
+      display: block;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--primario);
+      margin-top: 3px;
+      letter-spacing: 1px;
+    }
+
+    .fnl-row .b2c-cell {
+      border-right: 1px solid var(--tarjeta-borde);
+    }
+
+    .fnl-row .b2c-cell strong {
+      color: var(--primario-l);
+      font-weight: 700;
+    }
+
+    .fnl-row .b2b-cell strong {
+      color: var(--secundario-l);
+      font-weight: 700;
+    }
+
+    /* Cost bars */
+    .cb {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 11px 0;
+      font-size: 13.5px;
+    }
+
+    .cb-lbl {
+      flex: 0 0 220px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 600;
+    }
+
+    .cb-lbl .ic {
+      font-size: 18px;
+    }
+
+    .cb-bar {
+      flex: 1;
+      height: 30px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 7px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .cb-fill {
+      height: 100%;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      color: var(--blanco);
+    }
+
+    .cb-fill.f1 {
+      background: linear-gradient(90deg, var(--primario-d), var(--primario));
+    }
+
+    .cb-fill.f2 {
+      background: linear-gradient(90deg, var(--secundario-d), var(--secundario));
+    }
+
+    .cb-fill.f3 {
+      background: linear-gradient(90deg, #0F766E, var(--whatsapp));
+    }
+
+    .cb-fill.f4 {
+      background: linear-gradient(90deg, #92400E, #D97706);
+    }
+
+    .cb-fill.f5 {
+      background: linear-gradient(90deg, #3730A3, #6366F1);
+    }
+
+    .cb-fill.f6 {
+      background: linear-gradient(90deg, #9F1239, #E11D48);
+    }
+
+    .cb-val {
+      flex: 0 0 130px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .8);
+      text-align: right;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    /* Aliado tarjeta enriquecida */
+    .ali {
+      border-radius: 11px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      transition: all .25s;
+      border: 1px solid var(--tarjeta-borde);
+      background: var(--tarjeta-1);
+    }
+
+    .ali:hover {
+      transform: translateY(-2px);
+      border-color: var(--primario);
+    }
+
+    .ali-h {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .ali-ic {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+      background: rgba(155, 196, 98, .13);
+      border: 1px solid rgba(155, 196, 98, .2);
+    }
+
+    .ali.pr .ali-ic {
+      background: rgba(123, 90, 162, .15);
+      border-color: rgba(123, 90, 162, .25);
+    }
+
+    .ali h5 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 2px;
+      color: var(--blanco);
+    }
+
+    .ali .ali-cat {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--primario);
+    }
+
+    .ali.pr .ali-cat {
+      color: var(--secundario-l);
+    }
+
+    .ali p {
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: rgba(255, 255, 255, .62);
+    }
+
+    .ali .ali-aport {
+      font-size: 11px;
+      line-height: 1.5;
+      padding: 7px 9px;
+      border-radius: 6px;
+      background: rgba(155, 196, 98, .08);
+      border-left: 2px solid var(--primario);
+      color: rgba(255, 255, 255, .82);
+      margin-top: 3px;
+    }
+
+    .ali.pr .ali-aport {
+      background: rgba(123, 90, 162, .1);
+      border-left-color: var(--secundario-l);
+    }
+
+    /* Mapa de aliados grupos */
+    .ali-grp {
+      background: var(--tarjeta-2);
+      border: 1px solid var(--tarjeta-borde);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ali-grp .grp-ic {
+      font-size: 24px;
+    }
+
+    .ali-grp h4 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--primario);
+      letter-spacing: .3px;
+    }
+
+    .ali-grp.pr h4 {
+      color: var(--secundario-l);
+    }
+
+    .ali-grp p {
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, .7);
+    }
+
+    .ali-grp .grp-tag {
+      display: inline-block;
+      font-size: 9.5px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(155, 196, 98, .13);
+      color: var(--primario);
+      margin-bottom: 2px;
+      width: fit-content;
+    }
+
+    .ali-grp.pr .grp-tag {
+      background: rgba(123, 90, 162, .15);
+      color: var(--secundario-l);
+    }
+
+    /* Actividad clave (cinta) */
+    .act-rib {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .act {
+      display: grid;
+      grid-template-columns: 50px 1fr 220px;
+      gap: 18px;
+      padding: 16px 18px;
+      background: var(--tarjeta-1);
+      border: 1px solid var(--tarjeta-borde);
+      border-radius: 11px;
+      align-items: center;
+    }
+
+    .act-n {
+      font-family: 'Righteous', sans-serif;
+      font-size: 30px;
+      color: var(--primario);
+      text-align: center;
+      line-height: 1;
+    }
+
+    .act-c h5 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--blanco);
+      margin-bottom: 5px;
+      letter-spacing: .2px;
+    }
+
+    .act-c p {
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, .65);
+    }
+
+    .act-link {
+      font-size: 11px;
+      line-height: 1.55;
+      color: rgba(255, 255, 255, .55);
+      padding-left: 16px;
+      border-left: 2px solid var(--secundario-l);
+    }
+
+    .act-link strong {
+      color: var(--secundario-l);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-size: 9.5px;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    /* Parrilla mini visual */
+    .parrilla {
+      display: grid;
+      grid-template-columns: repeat(13, 1fr);
+      gap: 3px;
+      margin: 14px 0;
+    }
+
+    .pq {
+      height: 32px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      color: rgba(255, 255, 255, .85);
+    }
+
+    .pq.atr {
+      background: var(--primario-d);
+    }
+
+    .pq.con {
+      background: var(--secundario);
+    }
+
+    .pq.conv {
+      background: #D97706;
+    }
+
+    .pq.fid {
+      background: var(--whatsapp-d);
+    }
+
+    .pq.fer {
+      background: #E11D48;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .parrilla-leg {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      margin-top: 10px;
+    }
+
+    .parrilla-leg span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255, 255, 255, .65);
+    }
+
+    .parrilla-leg span::before {
+      content: '';
+      width: 11px;
+      height: 11px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .parrilla-leg .l-a::before {
+      background: var(--primario-d);
+    }
+
+    .parrilla-leg .l-c::before {
+      background: var(--secundario);
+    }
+
+    .parrilla-leg .l-v::before {
+      background: #D97706;
+    }
+
+    .parrilla-leg .l-f::before {
+      background: var(--whatsapp-d);
+    }
+
+    .parrilla-leg .l-fe::before {
+      background: #E11D48;
+    }
+
+    /* Cost summary */
+    .cost-sum {
+      background: var(--tarjeta-2);
+      border: 1px solid var(--tarjeta-borde);
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-top: 14px;
+    }
+
+    .cost-sum .cs-lbl {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .5);
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .cost-sum .cs-val {
+      font-family: 'Righteous', sans-serif;
+      font-size: 28px;
+      color: var(--primario);
+      letter-spacing: .5px;
+    }
+
+    .cost-sum .cs-note {
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, .55);
+      max-width: 340px;
+    }
+
+    /* Revenue cards */
+    .rev {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 18px;
+      background: var(--tarjeta-1);
+      border: 1px solid var(--tarjeta-borde);
+      border-radius: 12px;
+      transition: all .25s;
+    }
+
+    .rev:hover {
+      border-color: var(--primario);
+      transform: translateY(-2px);
+    }
+
+    .rev.pr:hover {
+      border-color: var(--secundario);
+    }
+
+    .rev-h {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .rev-ic {
+      font-size: 24px;
+    }
+
+    .rev .rev-cat {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--primario);
+    }
+
+    .rev.pr .rev-cat {
+      color: var(--secundario-l);
+    }
+
+    .rev h5 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--blanco);
+      line-height: 1.3;
+    }
+
+    .rev p {
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, .65);
+    }
+
+    .rev .rev-amt {
+      font-family: 'Righteous', sans-serif;
+      font-size: 15px;
+      color: var(--primario);
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: rgba(155, 196, 98, .1);
+      display: inline-block;
+      width: fit-content;
+      letter-spacing: .5px;
+    }
+
+    .rev.pr .rev-amt {
+      color: var(--secundario-l);
+      background: rgba(123, 90, 162, .12);
+    }
+
+    /* Footer */
+    .ft {
+      position: absolute;
+      bottom: 18px;
+      left: 80px;
+      right: 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .5px;
+    }
+
+    .s.dk .ft,
+    .s.nv .ft,
+    .s.gr .ft,
+    .s.pr .ft {
+      color: rgba(255, 255, 255, .2);
+    }
+
+    .s.lt .ft {
+      color: #9CA3AF;
+    }
+
+    .ft .ft-r {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ft .ft-r .ft-pill {
+      padding: 3px 9px;
+      border-radius: 5px;
+      background: rgba(155, 196, 98, .1);
+      color: var(--primario);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .s.lt .ft .ft-pill {
+      background: rgba(123, 90, 162, .1);
+      color: var(--secundario);
+    }
+
+    .s.gr .ft .ft-pill,
+    .s.pr .ft .ft-pill {
+      background: rgba(255, 255, 255, .13);
+      color: var(--blanco);
+    }
+
+    @media(max-width:800px) {
+      .ft {
+        left: 22px;
+        right: 22px;
+      }
+    }
+
+    /* Animations */
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(20px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .an {
+      opacity: 0;
+      animation: rise .55s ease forwards;
+      animation-play-state: paused;
+    }
+
+    .d1 {
+      animation-delay: .06s
+    }
+
+    .d2 {
+      animation-delay: .13s
+    }
+
+    .d3 {
+      animation-delay: .22s
+    }
+
+    .d4 {
+      animation-delay: .31s
+    }
+
+    .d5 {
+      animation-delay: .4s
+    }
+
+    .d6 {
+      animation-delay: .48s
+    }
+
+    /* Cover */
+    .cv-logo {
+      font-family: 'Righteous', sans-serif;
+      font-size: clamp(3rem, 7.5vw, 5.2rem);
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: 1px;
+    }
+
+    .cv-logo .ac {
+      color: var(--primario);
+    }
+
+    .cv-logo .dash {
+      color: var(--secundario-l);
+    }
+
+    .cv-sl {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--secundario-l);
+      margin: 10px 0 26px;
+      font-weight: 500;
+    }
+
+    .cv-sub {
+      font-family: 'Righteous', sans-serif;
+      font-size: clamp(1.3rem, 2.6vw, 1.85rem);
+      font-weight: 400;
+      color: rgba(255, 255, 255, .65);
+      font-style: normal;
+      margin-bottom: 30px;
+      letter-spacing: .5px;
+    }
+
+    .cv-team {
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .cv-team span {
+      font-size: 13px;
+      color: rgba(255, 255, 255, .4);
+      font-weight: 500;
+    }
+
+    .cv-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(155, 196, 98, .1);
+      border: 1px solid rgba(155, 196, 98, .25);
+      border-radius: 20px;
+      padding: 7px 18px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, .65);
+      margin-bottom: 20px;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .scroll-h {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: .3;
+      animation: bob 2s infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .scroll-h span {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .5);
+      font-weight: 600;
+    }
+
+    @keyframes bob {
+
+      0%,
+      100% {
+        transform: translateX(-50%) translateY(0)
+      }
+
+      50% {
+        transform: translateX(-50%) translateY(6px)
+      }
+    }
+
+    .divn {
+      font-family: 'Righteous', sans-serif;
+      font-size: clamp(8rem, 18vw, 14rem);
+      font-weight: 400;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      color: rgba(255, 255, 255, .025);
+      letter-spacing: 10px;
+    }
+
+    /* Header strip */
+    .strip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .strip.sg {
+      background: linear-gradient(90deg, var(--primario-d), var(--primario));
+    }
+
+    .strip.sp {
+      background: linear-gradient(90deg, var(--secundario-d), var(--secundario-l));
+    }
+
+    .strip.sb {
+      background: linear-gradient(90deg, var(--primario), var(--secundario-l));
+    }
+
+    /* Audiencia tag */
+    .aud {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .aud.b2c {
+      background: rgba(155, 196, 98, .13);
+      color: var(--primario);
+    }
+
+    .aud.b2b {
+      background: rgba(123, 90, 162, .18);
+      color: var(--secundario-l);
+    }
+
+    .aud.mx {
+      background: rgba(255, 255, 255, .08);
+      color: var(--blanco);
+    }
+
+    /* Canvas mini map */
+    .canvas-mini {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1fr 1fr 1.3fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    .cm-cell {
+      background: var(--tarjeta-1);
+      border: 1px solid var(--tarjeta-borde);
+      border-radius: 8px;
+      padding: 11px;
+      font-size: 11.5px;
+      line-height: 1.45;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      transition: all .2s;
+    }
+
+    .cm-cell:hover {
+      border-color: var(--primario);
+    }
+
+    .cm-cell.this {
+      border-color: var(--primario);
+      background: rgba(155, 196, 98, .07);
+    }
+
+    .cm-cell .cm-t {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--primario);
+    }
+
+    .cm-cell.this .cm-t {
+      color: var(--primario-l);
+    }
+
+    .cm-cell.dim .cm-t {
+      color: rgba(255, 255, 255, .4);
+    }
+
+    .cm-cell p {
+      font-size: 11px;
+      color: rgba(255, 255, 255, .7);
+      line-height: 1.5;
+    }
+
+    .cm-cell.dim {
+      opacity: .4;
+    }
+
+    .cm-cell.r2c1 {
+      grid-row: 2;
+      grid-column: 1;
+    }
+
+    .cm-cell.span2-r {
+      grid-row: span 2;
+    }
+
+    /* LAPTOP RESPONSIVE */
+    @media (min-width:801px) and (max-height:900px) {
+      .s {
+        padding: 32px 62px 40px;
+      }
+
+      .ft {
+        bottom: 11px;
+        left: 62px;
+        right: 62px;
+        font-size: 10.5px;
+      }
+
+      .lbl {
+        font-size: 10.5px;
+        letter-spacing: 3px;
+        margin-bottom: 8px;
+      }
+
+      .tt {
+        font-size: clamp(1.4rem, 2.6vw, 2.05rem) !important;
+        margin-bottom: 10px;
+      }
+
+      .sub {
+        font-size: clamp(0.85rem, 1.25vw, 0.98rem);
+      }
+
+      .card {
+        padding: 12px 14px;
+      }
+
+      .card-icon {
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+
+      .card h4 {
+        font-size: 13.5px;
+        margin-bottom: 5px;
+      }
+
+      .card p {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .card .tag {
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        margin-bottom: 5px;
+      }
+
+      .stmt {
+        font-size: clamp(0.86rem, 1.3vw, 1rem);
+        padding: 14px 18px;
+      }
+
+      .g2 {
+        gap: 11px;
+      }
+
+      .g3 {
+        gap: 10px;
+      }
+
+      .g4 {
+        gap: 9px;
+      }
+
+      .g5 {
+        gap: 8px;
+      }
+
+      .fc {
+        gap: 10px;
+      }
+
+      .chip {
+        font-size: 11px;
+        padding: 5px 10px;
+        margin: 2px;
+      }
+
+      .bi {
+        font-size: 12px;
+        padding: 5px 0;
+        line-height: 1.55;
+      }
+
+      .ali {
+        padding: 10px;
+      }
+
+      .ali h5 {
+        font-size: 12.5px;
+      }
+
+      .ali p {
+        font-size: 11px;
+      }
+
+      .ali .ali-aport {
+        font-size: 10px;
+        padding: 5px 7px;
+      }
+
+      .ali-grp {
+        padding: 13px;
+      }
+
+      .ali-grp h4 {
+        font-size: 12.5px;
+      }
+
+      .ali-grp p {
+        font-size: 11px;
+      }
+
+      .ali-ic {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+      }
+
+      .cv-logo {
+        font-size: clamp(2.2rem, 5vw, 3.6rem) !important;
+      }
+
+      .cv-sl {
+        font-size: 11px;
+        letter-spacing: 4px;
+        margin: 5px 0 17px;
+      }
+
+      .cv-sub {
+        font-size: clamp(1rem, 1.7vw, 1.35rem);
+        margin-bottom: 20px;
+      }
+
+      .cv-team span {
+        font-size: 11px;
+      }
+
+      .cv-pill {
+        font-size: 10px;
+        padding: 5px 13px;
+        margin-bottom: 14px;
+      }
+
+      .divn {
+        font-size: clamp(5rem, 12vw, 9rem);
+      }
+
+      .act {
+        padding: 11px 13px;
+        gap: 13px;
+      }
+
+      .act-n {
+        font-size: 24px;
+      }
+
+      .act-c h5 {
+        font-size: 12.8px;
+      }
+
+      .act-c p {
+        font-size: 11px;
+      }
+
+      .act-link {
+        font-size: 10px;
+      }
+
+      .act-link strong {
+        font-size: 8.5px;
+      }
+
+      .cb {
+        font-size: 12px;
+        margin: 8px 0;
+      }
+
+      .cb-lbl {
+        flex: 0 0 195px;
+      }
+
+      .cb-bar {
+        height: 24px;
+      }
+
+      .cb-fill {
+        font-size: 10px;
+      }
+
+      .cb-val {
+        font-size: 11px;
+        flex: 0 0 115px;
+      }
+
+      .fnl {
+        grid-template-columns: 110px 1fr 1fr;
+      }
+
+      .fnl-h {
+        padding: 9px 12px;
+        font-size: 10px;
+      }
+
+      .fnl-row>div {
+        padding: 11px 13px;
+        font-size: 11.5px;
+      }
+
+      .fnl-row .stage {
+        font-size: 12.5px;
+      }
+
+      .fnl-row .stage .pct {
+        font-size: 9.5px;
+      }
+
+      .pq {
+        height: 24px;
+        font-size: 7.5px;
+      }
+
+      .rev {
+        padding: 13px;
+        gap: 8px;
+      }
+
+      .rev h5 {
+        font-size: 12.8px;
+      }
+
+      .rev p {
+        font-size: 11px;
+      }
+
+      .rev-ic {
+        font-size: 20px;
+      }
+
+      .rev .rev-amt {
+        font-size: 12.5px;
+        padding: 4px 8px;
+      }
+
+      .rev .rev-cat {
+        font-size: 9px;
+      }
+
+      .cost-sum {
+        padding: 13px 16px;
+      }
+
+      .cost-sum .cs-val {
+        font-size: 22px;
+      }
+
+      .cost-sum .cs-lbl {
+        font-size: 10px;
+      }
+
+      .cost-sum .cs-note {
+        font-size: 10.5px;
+        max-width: 300px;
+      }
+
+      .cm-cell {
+        padding: 8px;
+        font-size: 10.5px;
+      }
+
+      .cm-cell .cm-t {
+        font-size: 9px;
+      }
+
+      .cm-cell p {
+        font-size: 10px;
+      }
+
+      .aud {
+        font-size: 9px;
+        padding: 3px 8px;
+        letter-spacing: 1.5px;
+      }
+    }
+
+    @media (min-width:801px) and (max-height:768px) {
+      .s {
+        padding: 24px 56px 32px;
+      }
+
+      .ft {
+        bottom: 8px;
+        left: 56px;
+        right: 56px;
+      }
+
+      .lbl {
+        margin-bottom: 5px;
+      }
+
+      .tt {
+        font-size: clamp(1.2rem, 2.1vw, 1.7rem) !important;
+        margin-bottom: 7px;
+      }
+
+      .sub {
+        font-size: clamp(0.8rem, 1.15vw, 0.92rem);
+      }
+
+      .card p {
+        font-size: 11.5px;
+      }
+
+      .stmt {
+        padding: 12px 16px;
+        font-size: 0.95rem;
+      }
+
+      .bi {
+        font-size: 11.5px;
+        padding: 4px 0;
+      }
+
+      .g2 {
+        gap: 9px;
+      }
+
+      .g3 {
+        gap: 8px;
+      }
+
+      .g4 {
+        gap: 8px;
+      }
+
+      .g5 {
+        gap: 7px;
+      }
+
+      .ali h5 {
+        font-size: 12px;
+      }
+
+      .ali p {
+        font-size: 10.5px;
+      }
+
+      .ali-grp h4 {
+        font-size: 12px;
+      }
+
+      .ali-grp p {
+        font-size: 10.5px;
+      }
+
+      .act {
+        padding: 9px 12px;
+      }
+
+      .act-n {
+        font-size: 22px;
+      }
+
+      .act-c h5 {
+        font-size: 12px;
+      }
+
+      .act-c p {
+        font-size: 10.5px;
+      }
+
+      .cb {
+        margin: 6px 0;
+      }
+
+      .cb-bar {
+        height: 20px;
+      }
+
+      .fnl-row>div {
+        padding: 9px 11px;
+        font-size: 11px;
+      }
+
+      .rev p {
+        font-size: 10.5px;
+      }
+
+      .rev h5 {
+        font-size: 12px;
+      }
+    }
+
+    /* Print: hide modals */
+    @media print {
+
+      .info-btn,
+      .modal-overlay {
+        display: none !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- Sidebar toggle -->
-<button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir navegación">☰</button>
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <h3>Entrega 4 · Slides</h3>
-    <button class="sidebar-close" id="sidebarClose" aria-label="Cerrar">&times;</button>
-  </div>
-  <ul class="sidebar-list" id="sidebarList">
-    <li><a href="#s0" data-slide="0"><span class="sb-num">1</span><span class="sb-txt">Portada</span></a></li>
-    <li><a href="#s1" data-slide="1"><span class="sb-num">2</span><span class="sb-txt">Cómo se lee este Canvas</span></a></li>
-    <li><a href="#s2" data-slide="2"><span class="sb-num">3</span><span class="sb-txt">01 · Asociaciones clave</span></a></li>
-    <li><a href="#s3" data-slide="3"><span class="sb-num">4</span><span class="sb-txt">Mapa de aliados</span></a></li>
-    <li><a href="#s4" data-slide="4"><span class="sb-num">5</span><span class="sb-txt">Aliados comerciales B2B</span></a></li>
-    <li><a href="#s5" data-slide="5"><span class="sb-num">6</span><span class="sb-txt">Aliados transmedia</span></a></li>
-    <li><a href="#s6" data-slide="6"><span class="sb-num">7</span><span class="sb-txt">Aliados de eventos y prensa</span></a></li>
-    <li><a href="#s7" data-slide="7"><span class="sb-num">8</span><span class="sb-txt">Aliados tecnológicos</span></a></li>
-    <li><a href="#s8" data-slide="8"><span class="sb-num">9</span><span class="sb-txt">02 · Actividades clave</span></a></li>
-    <li><a href="#s9" data-slide="9"><span class="sb-num">10</span><span class="sb-txt">Mapa de actividades</span></a></li>
-    <li><a href="#s10" data-slide="10"><span class="sb-num">11</span><span class="sb-txt">Producción de contenido</span></a></li>
-    <li><a href="#s11" data-slide="11"><span class="sb-num">12</span><span class="sb-txt">Gestión multicanal</span></a></li>
-    <li><a href="#s12" data-slide="12"><span class="sb-num">13</span><span class="sb-txt">Métricas y optimización</span></a></li>
-    <li><a href="#s13" data-slide="13"><span class="sb-num">14</span><span class="sb-txt">03 · Relación con clientes</span></a></li>
-    <li><a href="#s14" data-slide="14"><span class="sb-num">15</span><span class="sb-txt">Relación B2C</span></a></li>
-    <li><a href="#s15" data-slide="15"><span class="sb-num">16</span><span class="sb-txt">Relación B2B</span></a></li>
-    <li><a href="#s16" data-slide="16"><span class="sb-num">17</span><span class="sb-txt">Embudo y narrativa</span></a></li>
-    <li><a href="#s17" data-slide="17"><span class="sb-num">18</span><span class="sb-txt">04 · Estructura de costos</span></a></li>
-    <li><a href="#s18" data-slide="18"><span class="sb-num">19</span><span class="sb-txt">Distribución del Q3</span></a></li>
-    <li><a href="#s19" data-slide="19"><span class="sb-num">20</span><span class="sb-txt">Optimización</span></a></li>
-    <li><a href="#s20" data-slide="20"><span class="sb-num">21</span><span class="sb-txt">05 · Fuentes de ingresos</span></a></li>
-    <li><a href="#s21" data-slide="21"><span class="sb-num">22</span><span class="sb-txt">Ingresos B2C</span></a></li>
-    <li><a href="#s22" data-slide="22"><span class="sb-num">23</span><span class="sb-txt">Ingresos B2B + expansión</span></a></li>
-    <li><a href="#s23" data-slide="23"><span class="sb-num">24</span><span class="sb-txt">Cierre Canvas + Transmedia</span></a></li>
-  </ul>
-</aside>
-
-<nav class="nav" id="nav"></nav>
-
-<!-- ═══ S0 · COVER ═══ -->
-<section class="s dk" id="s0" style="align-items:center;text-align:center;">
-<div class="bg-p"></div>
-<div class="glow" style="width:520px;height:520px;top:-220px;left:-150px;background:var(--primario);opacity:.12;"></div>
-<div class="glow" style="width:420px;height:420px;bottom:-160px;right:-100px;background:var(--secundario);opacity:.1;"></div>
-<div style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:var(--secundario-l);margin-bottom:10px;" class="an">Entrega 04</div>
-<div class="cv-logo an d1"><span class="ac">i</span><span class="dash">-</span>Homotic</div>
-<div class="cv-sl an d2">sustainable &amp; efficient</div>
-<div class="cv-pill an d3">🧩 Modelo Canvas + Narrativa Transmedia</div>
-<div class="cv-sub an d4">Cómo i-Homotic <em style="font-style:normal;color:var(--primario);">crea, comunica y captura valor</em><br>en un ecosistema multiplataforma</div>
-<div class="cv-team an d5"><span>Mateo Ramírez</span><span>Ioav Mizrachi</span><span>Juan Camilo Bolaños</span></div>
-<div class="scroll-h"><span>Scroll</span><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
-</section>
-
-<!-- ═══ S1 · INTRO ═══ -->
-<section class="s dk" id="s1">
-<div class="bg-p"></div>
-<div class="strip sb"></div>
-<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:30px;margin-bottom:18px;">
-  <div style="flex:1;">
-    <div class="lbl an"><span class="pip"></span> Cómo se lee este Canvas</div>
-    <h2 class="tt an d1">Un Canvas que <span class="hi">cuenta</span> una historia<br><em>—no que la decora.</em></h2>
-    <p class="sub an d2" style="margin-bottom:14px;">Esta entrega cierra el ciclo del semestre articulando los 5 bloques del modelo de negocio que aún no se habían desarrollado a fondo. No es una repetición de la Entrega 2: es la lectura de cada bloque <strong style="color:var(--primario);font-weight:700;">bajo la lente transmedia</strong>, conectándolo con la parrilla de 60 contenidos, el embudo de conversión y los dos públicos objetivo.</p>
-  </div>
-</div>
-<div class="canvas-mini an d3">
-  <div class="cm-cell this"><div class="cm-t">01 · Aliados</div><p>Comerciales, transmedia, eventos, plataformas</p></div>
-  <div class="cm-cell this"><div class="cm-t">02 · Actividades</div><p>Producción, gestión, métricas, co-creación</p></div>
-  <div class="cm-cell this span2-r"><div class="cm-t">Propuesta de valor</div><p>Ya cubierto en Entrega 2</p></div>
-  <div class="cm-cell this"><div class="cm-t">03 · Relaciones</div><p>B2C, B2B, embudo narrativo</p></div>
-  <div class="cm-cell this span2-r"><div class="cm-t">Segmentos</div><p>Cubierto en Entrega 1</p></div>
-  <div class="cm-cell this"><div class="cm-t">Recursos clave</div><p>Entrega 2</p></div>
-  <div class="cm-cell this"><div class="cm-t">Canales</div><p>Entrega 3</p></div>
-</div>
-<div class="g2 an d4" style="margin-top:14px;">
-  <div class="cost-sum" style="margin:0;">
-    <div><div class="cs-lbl">Bloques de la Entrega</div><div class="cs-val" style="font-size:21px;">01 · 02 · 03 · 04 · 05</div></div>
-    <div class="cs-note">Asociaciones, Actividades, Relaciones, Costos e Ingresos. El bloque 06 (Publicidad y contenidos IA) se entrega aparte.</div>
-  </div>
-  <div class="cost-sum" style="margin:0;">
-    <div><div class="cs-lbl">Hilo conductor</div><div class="cs-val" style="font-size:21px;">Mi Casa Paso a Paso</div></div>
-    <div class="cs-note">Universo transmedia de Q3 2026 que articula los 5 bloques con la parrilla de 60 contenidos y el arco julio–septiembre.</div>
-  </div>
-</div>
-<div class="ft"><span>Introducción · Entrega 4</span><div class="ft-r"><span class="ft-pill">01 / 24</span></div></div>
-</section>
-
-<!-- ═══ S2 · DIVIDER 01: ASOCIACIONES ═══ -->
-<section class="s dk" id="s2" style="align-items:center;text-align:center;">
-<div class="bg-p"></div><div class="divn">01</div>
-<div class="lbl an"><span class="pip"></span> Bloque 01</div>
-<h2 class="tt an d1" style="font-size:clamp(2.4rem,5vw,3.8rem);">Asociaciones<br><em>clave 🤝</em></h2>
-<p class="sub an d2" style="text-align:center;max-width:760px;">Aliados estratégicos que no solo aportan negocio —<strong style="color:var(--primario);font-weight:700;">expanden la historia</strong>. Cada categoría tiene un rol explícito dentro del universo transmedia "Mi Casa Paso a Paso".</p>
-<div class="ft"><span>Asociaciones clave</span><div class="ft-r"><span class="ft-pill">02 / 24</span></div></div>
-</section>
-
-<!-- ═══ S3 · MAPA DE ALIADOS ═══ -->
-<section class="s dk" id="s3">
-<div class="strip sg"></div>
-<div class="lbl an"><span class="pip"></span> Bloque 01 · Mapa estratégico</div>
-<h2 class="tt an d1">Seis categorías,<br><em>dos públicos, <span class="hi">un universo narrativo</span>.</em></h2>
-<p class="sub an d2" style="margin-bottom:18px;">Cada alianza responde a un rol específico: comercial (vender), narrativo (contar), simbólico (validar), técnico (operar). En conjunto sostienen el embudo, alimentan la parrilla y reducen la dependencia del voz a voz.</p>
-<div class="g3 an d3">
-  <div class="ali-grp">
-    <span class="grp-tag">Comercial · B2B</span>
-    <div class="grp-ic">🏗️</div>
-    <h4>Constructoras e inmobiliarias</h4>
-    <p>Canal mayorista. Integran domótica desde el diseño eléctrico y convierten cada apartamento en un caso de marca i-Homotic.</p>
-  </div>
-  <div class="ali-grp pr">
-    <span class="grp-tag">Prescripción · B2B</span>
-    <div class="grp-ic">📐</div>
-    <h4>Firmas de arquitectura</h4>
-    <p>Prescriben tecnología a su cliente final. Su recomendación legitima la marca ante propietarios premium.</p>
-  </div>
-  <div class="ali-grp">
-    <span class="grp-tag">Narrativa · Mixto</span>
-    <div class="grp-ic">🎙️</div>
-    <h4>Creadores y co-narradores</h4>
-    <p>Cuentas de decoración, arquitectos visibles y propietarios reales. Multiplican el alcance del relato vivido.</p>
-  </div>
-  <div class="ali-grp pr">
-    <span class="grp-tag">Legitimidad · Mixto</span>
-    <div class="grp-ic">📰</div>
-    <h4>Medios y prensa especializada</h4>
-    <p>Cobertura editorial que respalda la propuesta ante el Explorador Informado, que valida en Google.</p>
-  </div>
-  <div class="ali-grp">
-    <span class="grp-tag">Activación · Mixto</span>
-    <div class="grp-ic">🎪</div>
-    <h4>Eventos y ferias</h4>
-    <p>Convierten lo digital en experiencia física. Feria del Diseño y Expoinmobiliaria son los nodos del Q3.</p>
-  </div>
-  <div class="ali-grp pr">
-    <span class="grp-tag">Infraestructura</span>
-    <div class="grp-ic">⚙️</div>
-    <h4>Plataformas tecnológicas</h4>
-    <p>Amazon, Google, Meta, LinkedIn. Sostienen tanto el producto (asistentes de voz) como la distribución del contenido.</p>
-  </div>
-</div>
-<div class="ft"><span>Asociaciones clave · Mapa</span><div class="ft-r"><span class="ft-pill">03 / 24</span></div></div>
-</section>
-
-<!-- ═══ S4 · ALIADOS COMERCIALES B2B ═══ -->
-<section class="s dk" id="s4">
-<div class="strip sp"></div>
-<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
-  <div>
-    <div class="lbl an"><span class="pip"></span> Bloque 01 · Aliados comerciales</div>
-    <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Constructoras y firmas <span class="hi">como canal mayorista</span></h2>
-  </div>
-  <div class="aud b2b an d1">B2B · Arturo González</div>
-</div>
-<p class="sub an d2" style="margin-bottom:14px;">Carlos aún no tiene alianzas formales, pero el ecosistema está identificado. <strong style="color:var(--primario);font-weight:700;">Estas alianzas no son solo ventas: son fábricas de casos de estudio</strong> que alimentan la parrilla transmedia con material visual real, lo cual responde directamente al Insight 1 ("la confianza se googlea").</p>
-<div class="g2 an d3">
-  <div style="display:flex;flex-direction:column;gap:9px;">
-    <div style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--primario);font-weight:700;margin-bottom:3px;">Constructoras propuestas</div>
-    <div class="ali">
-      <div class="ali-h"><div class="ali-ic">🏢</div><div><div class="ali-cat">Sostenibilidad · A+</div><h5>Arquitectura y Concreto</h5></div></div>
-      <p>+500 proyectos, 40 mil viviendas. Calificación Fitch A+. Alianza con Terso (solar). Certificación en construcción sostenible.</p>
-      <div class="ali-aport"><strong>Aporte transmedia:</strong> respaldo institucional + casos LEED para LinkedIn B2B.</div>
+  <!-- Sidebar toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir navegación">☰</button>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>Entrega 4 · Slides</h3>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Cerrar">&times;</button>
     </div>
-    <div class="ali">
-      <div class="ali-h"><div class="ali-ic">🌿</div><div><div class="ali-cat">EDGE + Sostenibilidad</div><h5>Bienes &amp; Bienes</h5></div></div>
-      <p>Proyectos en Sabaneta, Envigado, El Poblado. Proyecto Ecoh con certificación EDGE. Cuenta con área de desarrollo TI.</p>
-      <div class="ali-aport"><strong>Aporte transmedia:</strong> proyectos certificables como contenido cruzado en eje "Sostenibilidad" del pentágono.</div>
-    </div>
-    <div class="ali">
-      <div class="ali-h"><div class="ali-ic">🏘️</div><div><div class="ali-cat">Multi-marca · Nacional</div><h5>Amarilo + Estructurar + Cap.</h5></div></div>
-      <p>Amarilo (presencia nacional, certificaciones LEED Platinum), Estructurar (premium El Poblado/San Lucas), Capital (30 años).</p>
-      <div class="ali-aport"><strong>Aporte transmedia:</strong> tres niveles de mercado para diversificar casos de estudio (estratos 4, 5 y 6).</div>
-    </div>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:9px;">
-    <div style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--secundario-l);font-weight:700;margin-bottom:3px;">Firmas de arquitectura prescriptoras</div>
-    <div class="ali pr">
-      <div class="ali-h"><div class="ali-ic">📐</div><div><div class="ali-cat">23 años · +150 proyectos</div><h5>Alex Toro Arquitectos</h5></div></div>
-      <p>Firma consolidada en Medellín y área metropolitana. Trayectoria en multifamiliar de alta gama.</p>
-      <div class="ali-aport"><strong>Aporte transmedia:</strong> Alex Toro como "voz de arquitecto aliado" en posts LinkedIn y entrevistas para Reels.</div>
-    </div>
-    <div class="ali pr">
-      <div class="ali-h"><div class="ali-ic">🌳</div><div><div class="ali-cat">Alta gama · Naturaleza</div><h5>La Provenza Group</h5></div></div>
-      <p>Vivienda alta gama. Materiales nobles, jardines verticales, integración con paisaje.</p>
-      <div class="ali-aport"><strong>Aporte transmedia:</strong> estética aspiracional para Instagram + Pinterest. Cliente final alto poder adquisitivo.</div>
-    </div>
-    <div class="ali pr">
-      <div class="ali-h"><div class="ali-ic">🏡</div><div><div class="ali-cat">Diseño contemporáneo</div><h5>Peláez · Llano · Emme</h5></div></div>
-      <p>Peláez (Ele 16 premium), Llano Arquitectos (unifamiliar alta gama El Retiro), Emme (interiorismo joven, perfil tech-friendly).</p>
-      <div class="ali-aport"><strong>Aporte transmedia:</strong> red de prescripción multinodo. Cada firma referida activa contenido cruzado.</div>
-    </div>
-  </div>
-</div>
-<div class="ft"><span>Aliados comerciales B2B · Sin alianzas formales aún, ecosistema identificado</span><div class="ft-r"><span class="ft-pill">04 / 24</span></div></div>
-</section>
+    <ul class="sidebar-list" id="sidebarList">
+      <li><a href="#s0" data-slide="0"><span class="sb-num">1</span><span class="sb-txt">Portada</span></a></li>
+      <li><a href="#s1" data-slide="1"><span class="sb-num">2</span><span class="sb-txt">Cómo se lee este
+            Canvas</span></a></li>
+      <li><a href="#s2" data-slide="2"><span class="sb-num">3</span><span class="sb-txt">01 · Asociaciones
+            clave</span></a></li>
+      <li><a href="#s3" data-slide="3"><span class="sb-num">4</span><span class="sb-txt">Mapa de aliados</span></a></li>
+      <li><a href="#s4" data-slide="4"><span class="sb-num">5</span><span class="sb-txt">Aliados comerciales
+            B2B</span></a></li>
+      <li><a href="#s5" data-slide="5"><span class="sb-num">6</span><span class="sb-txt">Aliados transmedia</span></a>
+      </li>
+      <li><a href="#s6" data-slide="6"><span class="sb-num">7</span><span class="sb-txt">Aliados de eventos y
+            prensa</span></a></li>
+      <li><a href="#s7" data-slide="7"><span class="sb-num">8</span><span class="sb-txt">Aliados tecnológicos</span></a>
+      </li>
+      <li><a href="#s8" data-slide="8"><span class="sb-num">9</span><span class="sb-txt">02 · Actividades
+            clave</span></a></li>
+      <li><a href="#s9" data-slide="9"><span class="sb-num">10</span><span class="sb-txt">Mapa de actividades</span></a>
+      </li>
+      <li><a href="#s10" data-slide="10"><span class="sb-num">11</span><span class="sb-txt">Producción de
+            contenido</span></a></li>
+      <li><a href="#s11" data-slide="11"><span class="sb-num">12</span><span class="sb-txt">Gestión
+            multicanal</span></a></li>
+      <li><a href="#s12" data-slide="12"><span class="sb-num">13</span><span class="sb-txt">Métricas y
+            optimización</span></a></li>
+      <li><a href="#s13" data-slide="13"><span class="sb-num">14</span><span class="sb-txt">03 · Relación con
+            clientes</span></a></li>
+      <li><a href="#s14" data-slide="14"><span class="sb-num">15</span><span class="sb-txt">Relación B2C</span></a></li>
+      <li><a href="#s15" data-slide="15"><span class="sb-num">16</span><span class="sb-txt">Relación B2B</span></a></li>
+      <li><a href="#s16" data-slide="16"><span class="sb-num">17</span><span class="sb-txt">Embudo y
+            narrativa</span></a></li>
+      <li><a href="#s17" data-slide="17"><span class="sb-num">18</span><span class="sb-txt">04 · Estructura de
+            costos</span></a></li>
+      <li><a href="#s18" data-slide="18"><span class="sb-num">19</span><span class="sb-txt">Distribución del
+            Q3</span></a></li>
+      <li><a href="#s19" data-slide="19"><span class="sb-num">20</span><span class="sb-txt">Optimización</span></a></li>
+      <li><a href="#s20" data-slide="20"><span class="sb-num">21</span><span class="sb-txt">05 · Fuentes de
+            ingresos</span></a></li>
+      <li><a href="#s21" data-slide="21"><span class="sb-num">22</span><span class="sb-txt">Ingresos B2C</span></a></li>
+      <li><a href="#s22" data-slide="22"><span class="sb-num">23</span><span class="sb-txt">Ingresos B2B +
+            expansión</span></a></li>
+      <li><a href="#s23" data-slide="23"><span class="sb-num">24</span><span class="sb-txt">Cierre Canvas +
+            Transmedia</span></a></li>
+    </ul>
+  </aside>
 
-<!-- ═══ S5 · ALIADOS TRANSMEDIA ═══ -->
-<section class="s dk" id="s5">
-<div class="strip sg"></div>
-<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
-  <div>
-    <div class="lbl an"><span class="pip"></span> Bloque 01 · Alianzas transmedia</div>
-    <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Co-narradores que <span class="hi">expanden la historia</span></h2>
-  </div>
-  <div class="aud b2c an d1">B2C · Marcela / Eliana</div>
-</div>
-<p class="sub an d2" style="margin-bottom:14px;">Estas alianzas resuelven dos huecos que i-Homotic no puede llenar sola: <strong style="color:var(--primario);font-weight:700;">prueba social viva</strong> (testimonios reales) y <strong style="color:var(--primario);font-weight:700;">credibilidad heredada</strong> (cuentas que ya tienen autoridad en decoración o tech). Cada co-narrador suma una capa a "Mi Casa Paso a Paso".</p>
-<div class="g3 an d3">
-  <div class="ali">
-    <div class="ali-h"><div class="ali-ic">🏠</div><div><div class="ali-cat">Propietarios reales</div><h5>Familias instaladas</h5></div></div>
-    <p>Familias del showroom y de proyectos terminados que aceptan ser grabadas explicando su proceso. Testimonios espontáneos en stand.</p>
-    <div class="ali-aport"><strong>Adición narrativa:</strong> voces que llenan los Reels de "antes y después", carruseles de seguimiento a 6 meses y posts de fidelización.</div>
-  </div>
-  <div class="ali">
-    <div class="ali-h"><div class="ali-ic">📸</div><div><div class="ali-cat">Cuentas IG decoración</div><h5>@espaciosmate y similares</h5></div></div>
-    <p>Cuentas de decoración del Valle de Aburrá con audiencia consolidada en mujeres 30-55 años (perfil Marcela). Crossover con visita al showroom.</p>
-    <div class="ali-aport"><strong>Acceso a público:</strong> alcance orgánico al núcleo del Explorador Informado sin pauta paga. Validación estética cruzada.</div>
-  </div>
-  <div class="ali">
-    <div class="ali-h"><div class="ali-ic">🎥</div><div><div class="ali-cat">Creadores tech Colombia</div><h5>Canales YouTube/TikTok domótica</h5></div></div>
-    <p>Creadores que ya publican sobre "cómo empezar tu casa inteligente". Audiencia que busca proveedores locales después de informarse.</p>
-    <div class="ali-aport"><strong>Embudo SEO:</strong> reviews honestos del sistema i-Homotic que se posicionan en búsquedas "domótica Colombia".</div>
-  </div>
-  <div class="ali pr">
-    <div class="ali-h"><div class="ali-ic">🪑</div><div><div class="ali-cat">Tiendas de mobiliario aliadas</div><h5>BoConcept · Tugó · Verdetectura</h5></div></div>
-    <p>Showrooms vecinos que comparten cliente premium. Cruces de invitación: el cliente que decora con BoConcept es candidato a domótica.</p>
-    <div class="ali-aport"><strong>Activación física:</strong> co-presencia en eventos como Feria del Diseño + paquetes cruzados de visita.</div>
-  </div>
-  <div class="ali pr">
-    <div class="ali-h"><div class="ali-ic">🎓</div><div><div class="ali-cat">Académico · EAFIT</div><h5>Universidad EAFIT + semilleros</h5></div></div>
-    <p>Semilleros de Diseño, Negocios y Comunicación. Equipo estudiantil de la propia entrega como caso de uso.</p>
-    <div class="ali-aport"><strong>Legitimidad:</strong> respaldo académico + producción transmedia hecha por estudiantes (este mismo proyecto).</div>
-  </div>
-  <div class="ali pr">
-    <div class="ali-h"><div class="ali-ic">☀️</div><div><div class="ali-cat">Energías renovables</div><h5>Empresas de solar residencial</h5></div></div>
-    <p>Proveedores de paneles solares para hogar. La domótica de bajo voltaje (12-24V) de i-Homotic es complemento natural.</p>
-    <div class="ali-aport"><strong>Co-marketing:</strong> ofertas conjuntas "solar + automatización" y contenido cruzado de ahorro energético.</div>
-  </div>
-</div>
-<div class="ft"><span>Alianzas transmedia · Co-narradores del universo</span><div class="ft-r"><span class="ft-pill">05 / 24</span></div></div>
-</section>
+  <nav class="nav" id="nav"></nav>
 
-<!-- ═══ S6 · ALIADOS DE EVENTOS Y PRENSA ═══ -->
-<section class="s dk" id="s6">
-<div class="strip sp"></div>
-<div class="lbl an"><span class="pip"></span> Bloque 01 · Activación y legitimidad</div>
-<h2 class="tt an d1">Eventos y prensa <em>—donde lo digital <span class="hi">se vuelve cuerpo</span>.</em></h2>
-<p class="sub an d2" style="margin-bottom:14px;">La presencia editorial valida ante el Explorador Informado que googlea. La presencia ferial convierte seguidores en visitantes. Ambas categorías cierran lo que las redes sociales por sí solas no logran: <strong style="color:var(--primario);font-weight:700;">la decisión final</strong>.</p>
-<div class="g2 an d3">
-  <div>
-    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--primario);font-weight:700;margin-bottom:9px;">🎪 Eventos y ferias estratégicas</div>
-    <div style="display:flex;flex-direction:column;gap:9px;">
+  <!-- ═══ S0 · COVER ═══ -->
+  <section class="s dk" id="s0" style="align-items:center;text-align:center;">
+    <div class="bg-p"></div>
+    <div class="glow" style="width:520px;height:520px;top:-220px;left:-150px;background:var(--primario);opacity:.12;">
+    </div>
+    <div class="glow"
+      style="width:420px;height:420px;bottom:-160px;right:-100px;background:var(--secundario);opacity:.1;"></div>
+    <div
+      style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:var(--secundario-l);margin-bottom:10px;"
+      class="an">Entrega 04</div>
+    <div class="cv-logo an d1"><span class="ac">i</span><span class="dash">-</span>Homotic</div>
+    <div class="cv-sl an d2">sustainable &amp; efficient</div>
+    <div class="cv-pill an d3">🧩 Modelo Canvas + Narrativa Transmedia</div>
+    <div class="cv-sub an d4">Cómo i-Homotic <em style="font-style:normal;color:var(--primario);">crea, comunica y
+        captura valor</em><br>en un ecosistema multiplataforma</div>
+    <div class="cv-team an d5"><span>Mateo Ramírez</span><span>Ioav Mizrachi</span><span>Juan Camilo Bolaños</span>
+    </div>
+    <div class="scroll-h"><span>Scroll</span><svg width="13" height="13" fill="none" stroke="currentColor"
+        stroke-width="2" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12l7 7 7-7" />
+      </svg></div>
+  </section>
+
+  <!-- ═══ S1 · INTRO ═══ -->
+  <section class="s dk" id="s1">
+    <div class="bg-p"></div>
+    <div class="strip sb"></div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:30px;margin-bottom:18px;">
+      <div style="flex:1;">
+        <div class="lbl an"><span class="pip"></span> Cómo se lee este Canvas</div>
+        <h2 class="tt an d1">Un Canvas que <span class="hi">cuenta</span> una historia<br><em>—no que la decora.</em>
+        </h2>
+        <p class="sub an d2" style="margin-bottom:14px;">Esta entrega cierra el ciclo del semestre articulando los 5
+          bloques del modelo de negocio que aún no se habían desarrollado a fondo. No es una repetición de la Entrega 2:
+          es la lectura de cada bloque <strong style="color:var(--primario);font-weight:700;">bajo la lente
+            transmedia</strong>, conectándolo con la parrilla de 60 contenidos, el embudo de conversión y los dos
+          públicos objetivo.</p>
+      </div>
+    </div>
+    <div class="canvas-mini an d3">
+      <div class="cm-cell this">
+        <div class="cm-t">01 · Aliados</div>
+        <p>Comerciales, transmedia, eventos, plataformas</p>
+      </div>
+      <div class="cm-cell this">
+        <div class="cm-t">02 · Actividades</div>
+        <p>Producción, gestión, métricas, co-creación</p>
+      </div>
+      <div class="cm-cell dim span2-r">
+        <div class="cm-t">Propuesta de valor</div>
+        <p style="opacity:.7;">Ya cubierto en Entrega 2</p>
+      </div>
+      <div class="cm-cell this">
+        <div class="cm-t">03 · Relaciones</div>
+        <p>B2C, B2B, embudo narrativo</p>
+      </div>
+      <div class="cm-cell dim span2-r">
+        <div class="cm-t">Segmentos</div>
+        <p style="opacity:.7;">Cubierto en Entrega 1</p>
+      </div>
+      <div class="cm-cell dim">
+        <div class="cm-t">Recursos clave</div>
+        <p style="opacity:.7;">Entrega 2</p>
+      </div>
+      <div class="cm-cell dim">
+        <div class="cm-t">Canales</div>
+        <p style="opacity:.7;">Entrega 3</p>
+      </div>
+    </div>
+    <div class="g2 an d4" style="margin-top:14px;">
+      <div class="cost-sum" style="margin:0;">
+        <div>
+          <div class="cs-lbl">Bloques de la Entrega</div>
+          <div class="cs-val" style="font-size:21px;">01 · 02 · 03 · 04 · 05</div>
+        </div>
+        <div class="cs-note">Asociaciones, Actividades, Relaciones, Costos e Ingresos. El bloque 06 (Publicidad y
+          contenidos IA) se entrega aparte.</div>
+      </div>
+      <div class="cost-sum" style="margin:0;">
+        <div>
+          <div class="cs-lbl">Hilo conductor</div>
+          <div class="cs-val" style="font-size:21px;">Mi Casa Paso a Paso</div>
+        </div>
+        <div class="cs-note">Universo transmedia de Q3 2026 que articula los 5 bloques con la parrilla de 60 contenidos
+          y el arco julio–septiembre.</div>
+      </div>
+    </div>
+    <div class="ft"><span>Introducción · Entrega 4</span>
+      <div class="ft-r"><span class="ft-pill">01 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S2 · DIVIDER 01: ASOCIACIONES ═══ -->
+  <section class="s dk" id="s2" style="align-items:center;text-align:center;">
+    <div class="bg-p"></div>
+    <div class="divn">01</div>
+    <div class="lbl an"><span class="pip"></span> Bloque 01</div>
+    <h2 class="tt an d1" style="font-size:clamp(2.4rem,5vw,3.8rem);">Asociaciones<br><em>clave 🤝</em></h2>
+    <p class="sub an d2" style="text-align:center;max-width:760px;">Aliados estratégicos que no solo aportan negocio
+      —<strong style="color:var(--primario);font-weight:700;">expanden la historia</strong>. Cada categoría tiene un rol
+      explícito dentro del universo transmedia "Mi Casa Paso a Paso".</p>
+    <div class="ft"><span>Asociaciones clave</span>
+      <div class="ft-r"><span class="ft-pill">02 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S3 · MAPA DE ALIADOS ═══ -->
+  <section class="s dk" id="s3">
+    <div class="strip sg"></div>
+    <div class="lbl an"><span class="pip"></span> Bloque 01 · Mapa estratégico</div>
+    <h2 class="tt an d1">Seis categorías,<br><em>dos públicos, <span class="hi">un universo narrativo</span>.</em></h2>
+    <p class="sub an d2" style="margin-bottom:18px;">Cada alianza responde a un rol específico: comercial (vender),
+      narrativo (contar), simbólico (validar), técnico (operar). En conjunto sostienen el embudo, alimentan la parrilla
+      y reducen la dependencia del voz a voz.</p>
+    <div class="g3 an d3">
+      <div class="ali-grp">
+        <span class="grp-tag">Comercial · B2B</span>
+        <div class="grp-ic">🏗️</div>
+        <h4>Constructoras e inmobiliarias</h4>
+        <p>Canal mayorista. Integran domótica desde el diseño eléctrico y convierten cada apartamento en un caso de
+          marca i-Homotic.</p>
+      </div>
+      <div class="ali-grp pr">
+        <span class="grp-tag">Prescripción · B2B</span>
+        <div class="grp-ic">📐</div>
+        <h4>Firmas de arquitectura</h4>
+        <p>Prescriben tecnología a su cliente final. Su recomendación legitima la marca ante propietarios premium.</p>
+      </div>
+      <div class="ali-grp">
+        <span class="grp-tag">Narrativa · Mixto</span>
+        <div class="grp-ic">🎙️</div>
+        <h4>Creadores y co-narradores</h4>
+        <p>Cuentas de decoración, arquitectos visibles y propietarios reales. Multiplican el alcance del relato vivido.
+        </p>
+      </div>
+      <div class="ali-grp pr">
+        <span class="grp-tag">Legitimidad · Mixto</span>
+        <div class="grp-ic">📰</div>
+        <h4>Medios y prensa especializada</h4>
+        <p>Cobertura editorial que respalda la propuesta ante el Explorador Informado, que valida en Google.</p>
+      </div>
+      <div class="ali-grp">
+        <span class="grp-tag">Activación · Mixto</span>
+        <div class="grp-ic">🎪</div>
+        <h4>Eventos y ferias</h4>
+        <p>Convierten lo digital en experiencia física. Feria del Diseño y Expoinmobiliaria son los nodos del Q3.</p>
+      </div>
+      <div class="ali-grp pr">
+        <span class="grp-tag">Infraestructura</span>
+        <div class="grp-ic">⚙️</div>
+        <h4>Plataformas tecnológicas</h4>
+        <p>Amazon, Google, Meta, LinkedIn. Sostienen tanto el producto (asistentes de voz) como la distribución del
+          contenido.</p>
+      </div>
+    </div>
+    <div class="ft"><span>Asociaciones clave · Mapa</span>
+      <div class="ft-r"><span class="ft-pill">03 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S4 · ALIADOS COMERCIALES B2B ═══ -->
+  <section class="s dk" id="s4">
+    <div class="strip sp"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
+      <div>
+        <div class="lbl an"><span class="pip"></span> Bloque 01 · Aliados comerciales</div>
+        <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Constructoras y firmas <span class="hi">como
+            canal mayorista</span></h2>
+      </div>
+      <div class="aud b2b an d1">B2B · Arturo González</div>
+    </div>
+    <p class="sub an d2" style="margin-bottom:14px;">Carlos aún no tiene alianzas formales, pero el ecosistema está
+      identificado. <strong style="color:var(--primario);font-weight:700;">Estas alianzas no son solo ventas: son
+        fábricas de casos de estudio</strong> que alimentan la parrilla transmedia con material visual real, lo cual
+      responde directamente al Insight 1 ("la confianza se googlea").</p>
+    <div class="g2 an d3">
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div
+          style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--primario);font-weight:700;margin-bottom:3px;">
+          Constructoras propuestas</div>
+        <div class="ali">
+          <div class="ali-h">
+            <div class="ali-ic">🏢</div>
+            <div>
+              <div class="ali-cat">Sostenibilidad · A+</div>
+              <h5>Arquitectura y Concreto</h5>
+            </div>
+          </div>
+          <p>+500 proyectos, 40 mil viviendas. Calificación Fitch A+. Alianza con Terso (solar). Certificación en
+            construcción sostenible.</p>
+          <div class="ali-aport"><strong>Aporte transmedia:</strong> respaldo institucional + casos LEED para LinkedIn
+            B2B.</div>
+        </div>
+        <div class="ali">
+          <div class="ali-h">
+            <div class="ali-ic">🌿</div>
+            <div>
+              <div class="ali-cat">EDGE + Sostenibilidad</div>
+              <h5>Bienes &amp; Bienes</h5>
+            </div>
+          </div>
+          <p>Proyectos en Sabaneta, Envigado, El Poblado. Proyecto Ecoh con certificación EDGE. Cuenta con área de
+            desarrollo TI.</p>
+          <div class="ali-aport"><strong>Aporte transmedia:</strong> proyectos certificables como contenido cruzado en
+            eje "Sostenibilidad" del pentágono.</div>
+        </div>
+        <div class="ali">
+          <div class="ali-h">
+            <div class="ali-ic">🏘️</div>
+            <div>
+              <div class="ali-cat">Multi-marca · Nacional</div>
+              <h5>Amarilo + Estructurar + Cap.</h5>
+            </div>
+          </div>
+          <p>Amarilo (presencia nacional, certificaciones LEED Platinum), Estructurar (premium El Poblado/San Lucas),
+            Capital (30 años).</p>
+          <div class="ali-aport"><strong>Aporte transmedia:</strong> tres niveles de mercado para diversificar casos de
+            estudio (estratos 4, 5 y 6).</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div
+          style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--secundario-l);font-weight:700;margin-bottom:3px;">
+          Firmas de arquitectura prescriptoras</div>
+        <div class="ali pr">
+          <div class="ali-h">
+            <div class="ali-ic">📐</div>
+            <div>
+              <div class="ali-cat">23 años · +150 proyectos</div>
+              <h5>Alex Toro Arquitectos</h5>
+            </div>
+          </div>
+          <p>Firma consolidada en Medellín y área metropolitana. Trayectoria en multifamiliar de alta gama.</p>
+          <div class="ali-aport"><strong>Aporte transmedia:</strong> Alex Toro como "voz de arquitecto aliado" en posts
+            LinkedIn y entrevistas para Reels.</div>
+        </div>
+        <div class="ali pr">
+          <div class="ali-h">
+            <div class="ali-ic">🌳</div>
+            <div>
+              <div class="ali-cat">Alta gama · Naturaleza</div>
+              <h5>La Provenza Group</h5>
+            </div>
+          </div>
+          <p>Vivienda alta gama. Materiales nobles, jardines verticales, integración con paisaje.</p>
+          <div class="ali-aport"><strong>Aporte transmedia:</strong> estética aspiracional para Instagram + Pinterest.
+            Cliente final alto poder adquisitivo.</div>
+        </div>
+        <div class="ali pr">
+          <div class="ali-h">
+            <div class="ali-ic">🏡</div>
+            <div>
+              <div class="ali-cat">Diseño contemporáneo</div>
+              <h5>Peláez · Llano · Emme</h5>
+            </div>
+          </div>
+          <p>Peláez (Ele 16 premium), Llano Arquitectos (unifamiliar alta gama El Retiro), Emme (interiorismo joven,
+            perfil tech-friendly).</p>
+          <div class="ali-aport"><strong>Aporte transmedia:</strong> red de prescripción multinodo. Cada firma referida
+            activa contenido cruzado.</div>
+        </div>
+      </div>
+    </div>
+    <div class="ft"><span>Aliados comerciales B2B · Sin alianzas formales aún, ecosistema identificado</span>
+      <div class="ft-r"><span class="ft-pill">04 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S5 · ALIADOS TRANSMEDIA ═══ -->
+  <section class="s dk" id="s5">
+    <div class="strip sg"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
+      <div>
+        <div class="lbl an"><span class="pip"></span> Bloque 01 · Alianzas transmedia</div>
+        <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Co-narradores que <span class="hi">expanden
+            la historia</span></h2>
+      </div>
+      <div class="aud b2c an d1">B2C · Marcela / Eliana</div>
+    </div>
+    <p class="sub an d2" style="margin-bottom:14px;">Estas alianzas resuelven dos huecos que i-Homotic no puede llenar
+      sola: <strong style="color:var(--primario);font-weight:700;">prueba social viva</strong> (testimonios reales) y
+      <strong style="color:var(--primario);font-weight:700;">credibilidad heredada</strong> (cuentas que ya tienen
+      autoridad en decoración o tech). Cada co-narrador suma una capa a "Mi Casa Paso a Paso".</p>
+    <div class="g3 an d3">
       <div class="ali">
-        <div class="ali-h"><div class="ali-ic">⭐</div><div><div class="ali-cat">Pico del Q3 · 10-12 sept</div><h5>Feria del Diseño · Plaza Mayor</h5></div></div>
-        <p>Stand propio de i-Homotic durante 3 días. Pico narrativo del trimestre y meta de 200 visitas + 30 cotizaciones.</p>
-        <div class="ali-aport"><strong>Rol transmedia:</strong> nodo donde convergen todos los canales. Suscriptores del WhatsApp Canal reciben check-in exclusivo.</div>
-      </div>
-      <div class="ali pr">
-        <div class="ali-h"><div class="ali-ic">🏗️</div><div><div class="ali-cat">B2B · Anual</div><h5>Expoinmobiliaria — Camacol Antioquia</h5></div></div>
-        <p>518 proyectos, 69 constructoras competidoras. Punto de encuentro natural con Arturo González y firmas de arquitectura.</p>
-        <div class="ali-aport"><strong>Rol transmedia:</strong> posts LinkedIn de cobertura + agenda de demos técnicas en showroom (15 y 45 min).</div>
+        <div class="ali-h">
+          <div class="ali-ic">🏠</div>
+          <div>
+            <div class="ali-cat">Propietarios reales</div>
+            <h5>Familias instaladas</h5>
+          </div>
+        </div>
+        <p>Familias del showroom y de proyectos terminados que aceptan ser grabadas explicando su proceso. Testimonios
+          espontáneos en stand.</p>
+        <div class="ali-aport"><strong>Adición narrativa:</strong> voces que llenan los Reels de "antes y después",
+          carruseles de seguimiento a 6 meses y posts de fidelización.</div>
       </div>
       <div class="ali">
-        <div class="ali-h"><div class="ali-ic">🎨</div><div><div class="ali-cat">Diseño y arquitectura</div><h5>FAD Medellín + Ruta N</h5></div></div>
-        <p>Festival de Arquitectura y Diseño + ecosistema de innovación Ruta N. Comunidad creativa del Valle de Aburrá.</p>
-        <div class="ali-aport"><strong>Rol transmedia:</strong> activación de la narrativa "innovación colombiana" del arquetipo Creador.</div>
+        <div class="ali-h">
+          <div class="ali-ic">📸</div>
+          <div>
+            <div class="ali-cat">Cuentas IG decoración</div>
+            <h5>@espaciosmate y similares</h5>
+          </div>
+        </div>
+        <p>Cuentas de decoración del Valle de Aburrá con audiencia consolidada en mujeres 30-55 años (perfil Marcela).
+          Crossover con visita al showroom.</p>
+        <div class="ali-aport"><strong>Acceso a público:</strong> alcance orgánico al núcleo del Explorador Informado
+          sin pauta paga. Validación estética cruzada.</div>
       </div>
-    </div>
-  </div>
-  <div>
-    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--secundario-l);font-weight:700;margin-bottom:9px;">📰 Medios y prensa especializada</div>
-    <div style="display:flex;flex-direction:column;gap:9px;">
+      <div class="ali">
+        <div class="ali-h">
+          <div class="ali-ic">🎥</div>
+          <div>
+            <div class="ali-cat">Creadores tech Colombia</div>
+            <h5>Canales YouTube/TikTok domótica</h5>
+          </div>
+        </div>
+        <p>Creadores que ya publican sobre "cómo empezar tu casa inteligente". Audiencia que busca proveedores locales
+          después de informarse.</p>
+        <div class="ali-aport"><strong>Embudo SEO:</strong> reviews honestos del sistema i-Homotic que se posicionan en
+          búsquedas "domótica Colombia".</div>
+      </div>
       <div class="ali pr">
-        <div class="ali-h"><div class="ali-ic">📔</div><div><div class="ali-cat">Arquitectura premium</div><h5>Revista Axxis</h5></div></div>
-        <p>Referente editorial colombiano en arquitectura y diseño. Lectores con poder adquisitivo + interés en innovación residencial.</p>
-        <div class="ali-aport"><strong>Aporte:</strong> nota editorial respalda el Insight 1 de búsqueda digital — un artículo cura el "googleo" del cliente.</div>
+        <div class="ali-h">
+          <div class="ali-ic">🪑</div>
+          <div>
+            <div class="ali-cat">Tiendas de mobiliario aliadas</div>
+            <h5>BoConcept · Tugó · Verdetectura</h5>
+          </div>
+        </div>
+        <p>Showrooms vecinos que comparten cliente premium. Cruces de invitación: el cliente que decora con BoConcept es
+          candidato a domótica.</p>
+        <div class="ali-aport"><strong>Activación física:</strong> co-presencia en eventos como Feria del Diseño +
+          paquetes cruzados de visita.</div>
       </div>
       <div class="ali pr">
-        <div class="ali-h"><div class="ali-ic">📰</div><div><div class="ali-cat">Diario regional</div><h5>El Colombiano · sección Vivir</h5></div></div>
-        <p>Cobertura local sobre tecnología, vivienda y sostenibilidad. Llega tanto al Explorador Informado como al tomador de decisión B2B.</p>
-        <div class="ali-aport"><strong>Aporte:</strong> reportajes de "innovación paisa" + cobertura de Feria del Diseño desde un ángulo regional.</div>
+        <div class="ali-h">
+          <div class="ali-ic">🎓</div>
+          <div>
+            <div class="ali-cat">Académico · EAFIT</div>
+            <h5>Universidad EAFIT + semilleros</h5>
+          </div>
+        </div>
+        <p>Semilleros de Diseño, Negocios y Comunicación. Equipo estudiantil de la propia entrega como caso de uso.</p>
+        <div class="ali-aport"><strong>Legitimidad:</strong> respaldo académico + producción transmedia hecha por
+          estudiantes (este mismo proyecto).</div>
       </div>
       <div class="ali pr">
-        <div class="ali-h"><div class="ali-ic">🏛️</div><div><div class="ali-cat">Gremio · B2B</div><h5>Camacol Antioquia · Portafolio</h5></div></div>
-        <p>Camacol como gremio constructor convoca y certifica. Portafolio como medio nacional de negocios da escala a la propuesta.</p>
-        <div class="ali-aport"><strong>Aporte:</strong> dos puertas a Arturo González: una gremial (cercanía) y otra periodística (credibilidad).</div>
+        <div class="ali-h">
+          <div class="ali-ic">☀️</div>
+          <div>
+            <div class="ali-cat">Energías renovables</div>
+            <h5>Empresas de solar residencial</h5>
+          </div>
+        </div>
+        <p>Proveedores de paneles solares para hogar. La domótica de bajo voltaje (12-24V) de i-Homotic es complemento
+          natural.</p>
+        <div class="ali-aport"><strong>Co-marketing:</strong> ofertas conjuntas "solar + automatización" y contenido
+          cruzado de ahorro energético.</div>
       </div>
     </div>
-  </div>
-</div>
-<div class="ft"><span>Eventos y prensa · Lo digital se valida fuera de la pantalla</span><div class="ft-r"><span class="ft-pill">06 / 24</span></div></div>
-</section>
-
-<!-- ═══ S7 · ALIADOS TECNOLÓGICOS ═══ -->
-<section class="s dk" id="s7">
-<div class="strip sb"></div>
-<div class="lbl an"><span class="pip"></span> Bloque 01 · Infraestructura digital</div>
-<h2 class="tt an d1">Plataformas que <em>sostienen el producto <span class="hi">y la historia</span>.</em></h2>
-<p class="sub an d2" style="margin-bottom:14px;">Estas alianzas son técnicas, pero su rol es transmedia: <strong style="color:var(--primario);font-weight:700;">sin Meta no hay Instagram; sin LinkedIn no hay narrativa B2B; sin Amazon/Google no hay control por voz.</strong> i-Homotic desarrolló su propia librería para no depender de SDKs costosos, pero la plataforma de distribución sigue siendo de terceros.</p>
-<div class="g4 an d3">
-  <div class="card c-darker">
-    <div class="card-icon">🗣️</div>
-    <span class="tag">Producto</span>
-    <h4>Amazon · Google · Apple</h4>
-    <p>Asistentes Alexa, Google Assistant y Siri. i-Homotic desarrolló <strong style="color:var(--primario);">librería propia</strong> para comunicar sin pagar SDKs.</p>
-  </div>
-  <div class="card c-darker">
-    <div class="card-icon">📱</div>
-    <span class="tag">Distribución B2C</span>
-    <h4>Meta Business</h4>
-    <p>Instagram + WhatsApp Business + Canal de WhatsApp. Núcleo de la atracción B2C y de la fidelización cálida.</p>
-  </div>
-  <div class="card c-darker">
-    <div class="card-icon">💼</div>
-    <span class="tag">Distribución B2B</span>
-    <h4>LinkedIn</h4>
-    <p>Atracción profesional ante Arturo González. Pauta en posts de cierre de Q3 + save the dates de Feria.</p>
-  </div>
-  <div class="card c-darker">
-    <div class="card-icon">🔍</div>
-    <span class="tag">Descubrimiento</span>
-    <h4>Google · YouTube Shorts</h4>
-    <p>SEO de "qué es domótica" + Shorts educativos de 60s. Primera puerta de entrada antes que el cliente sepa que i-Homotic existe.</p>
-  </div>
-</div>
-<div class="stmt st-dark an d4" style="margin-top:18px;">
-  <strong>Lectura estratégica:</strong> i-Homotic es independiente en lo técnico (firmware, software y librería propios) pero <strong>interdependiente en la distribución narrativa</strong>. Por eso la pauta y el orgánico deben combinarse con prudencia: no se construye una marca encima de algoritmos que pueden cambiar.
-</div>
-<div class="ft"><span>Aliados tecnológicos · La capa invisible</span><div class="ft-r"><span class="ft-pill">07 / 24</span></div></div>
-</section>
-
-<!-- ═══ S8 · DIVIDER 02: ACTIVIDADES ═══ -->
-<section class="s dk" id="s8" style="align-items:center;text-align:center;">
-<div class="bg-p"></div><div class="divn">02</div>
-<div class="lbl an"><span class="pip"></span> Bloque 02</div>
-<h2 class="tt an d1" style="font-size:clamp(2.4rem,5vw,3.8rem);">Actividades<br><em>clave ⚙️</em></h2>
-<p class="sub an d2" style="text-align:center;max-width:760px;">No las actividades del negocio (programar, ensamblar, instalar). Las actividades de <strong style="color:var(--primario);font-weight:700;">comunicación transmedia</strong> que hacen que la propuesta de valor llegue, se entienda y se elija — conectadas con la parrilla de 60 contenidos.</p>
-<div class="ft"><span>Actividades clave</span><div class="ft-r"><span class="ft-pill">08 / 24</span></div></div>
-</section>
-
-<!-- ═══ S9 · MAPA DE ACTIVIDADES ═══ -->
-<section class="s dk" id="s9">
-<div class="strip sg"></div>
-<div class="lbl an"><span class="pip"></span> Bloque 02 · Mapa de actividades</div>
-<h2 class="tt an d1">Cinco actividades <em>—un solo <span class="hi">motor narrativo</span>.</em></h2>
-<p class="sub an d2" style="margin-bottom:14px;">Cada actividad alimenta a la siguiente: <strong style="color:var(--primario);font-weight:700;">curación narrativa → producción → publicación → análisis → activación con aliados</strong>. El ciclo se repite cada semana durante las 13 semanas del Q3.</p>
-<div class="act-rib an d3">
-  <div class="act">
-    <div class="act-n">01</div>
-    <div class="act-c">
-      <h5>Curación narrativa y storytelling</h5>
-      <p>Mantenimiento del universo "Mi Casa Paso a Paso": coherencia entre los 4 ejes del pentágono (Educación, Evidencia, Hogar, Comunidad, Eficiencia), guionización de Reels y Shorts, manejo de expansiones (adición narrativa, espacios en blanco, agujeros de conejo).</p>
+    <div class="ft"><span>Alianzas transmedia · Co-narradores del universo</span>
+      <div class="ft-r"><span class="ft-pill">05 / 24</span></div>
     </div>
-    <div class="act-link"><strong>Responsable</strong>Juan Camilo · guionista y creador visual. Coherencia entre la web, el manual de marca y los 60 contenidos.</div>
-  </div>
-  <div class="act">
-    <div class="act-n">02</div>
-    <div class="act-c">
-      <h5>Producción de contenido multiplataforma</h5>
-      <p>Grabación en showroom y hogares aliados (testimonios, antes/después, escenas), edición de YouTube Shorts (60s), Reels de FAQ, fotografía para carruseles, captura de cobertura en vivo de la Feria del Diseño y "repurposing" sistemático.</p>
+  </section>
+
+  <!-- ═══ S6 · ALIADOS DE EVENTOS Y PRENSA ═══ -->
+  <section class="s dk" id="s6">
+    <div class="strip sp"></div>
+    <div class="lbl an"><span class="pip"></span> Bloque 01 · Activación y legitimidad</div>
+    <h2 class="tt an d1">Eventos y prensa <em>—donde lo digital <span class="hi">se vuelve cuerpo</span>.</em></h2>
+    <p class="sub an d2" style="margin-bottom:14px;">La presencia editorial valida ante el Explorador Informado que
+      googlea. La presencia ferial convierte seguidores en visitantes. Ambas categorías cierran lo que las redes
+      sociales por sí solas no logran: <strong style="color:var(--primario);font-weight:700;">la decisión
+        final</strong>.</p>
+    <div class="g2 an d3">
+      <div>
+        <div
+          style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--primario);font-weight:700;margin-bottom:9px;">
+          🎪 Eventos y ferias estratégicas</div>
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <div class="ali">
+            <div class="ali-h">
+              <div class="ali-ic">⭐</div>
+              <div>
+                <div class="ali-cat">Pico del Q3 · 10-12 sept</div>
+                <h5>Feria del Diseño · Plaza Mayor</h5>
+              </div>
+            </div>
+            <p>Stand propio de i-Homotic durante 3 días. Pico narrativo del trimestre y meta de 200 visitas + 30
+              cotizaciones.</p>
+            <div class="ali-aport"><strong>Rol transmedia:</strong> nodo donde convergen todos los canales. Suscriptores
+              del WhatsApp Canal reciben check-in exclusivo.</div>
+          </div>
+          <div class="ali pr">
+            <div class="ali-h">
+              <div class="ali-ic">🏗️</div>
+              <div>
+                <div class="ali-cat">B2B · Anual</div>
+                <h5>Expoinmobiliaria — Camacol Antioquia</h5>
+              </div>
+            </div>
+            <p>518 proyectos, 69 constructoras competidoras. Punto de encuentro natural con Arturo González y firmas de
+              arquitectura.</p>
+            <div class="ali-aport"><strong>Rol transmedia:</strong> posts LinkedIn de cobertura + agenda de demos
+              técnicas en showroom (15 y 45 min).</div>
+          </div>
+          <div class="ali">
+            <div class="ali-h">
+              <div class="ali-ic">🎨</div>
+              <div>
+                <div class="ali-cat">Diseño y arquitectura</div>
+                <h5>FAD Medellín + Ruta N</h5>
+              </div>
+            </div>
+            <p>Festival de Arquitectura y Diseño + ecosistema de innovación Ruta N. Comunidad creativa del Valle de
+              Aburrá.</p>
+            <div class="ali-aport"><strong>Rol transmedia:</strong> activación de la narrativa "innovación colombiana"
+              del arquetipo Creador.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div
+          style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--secundario-l);font-weight:700;margin-bottom:9px;">
+          📰 Medios y prensa especializada</div>
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <div class="ali pr">
+            <div class="ali-h">
+              <div class="ali-ic">📔</div>
+              <div>
+                <div class="ali-cat">Arquitectura premium</div>
+                <h5>Revista Axxis</h5>
+              </div>
+            </div>
+            <p>Referente editorial colombiano en arquitectura y diseño. Lectores con poder adquisitivo + interés en
+              innovación residencial.</p>
+            <div class="ali-aport"><strong>Aporte:</strong> nota editorial respalda el Insight 1 de búsqueda digital —
+              un artículo cura el "googleo" del cliente.</div>
+          </div>
+          <div class="ali pr">
+            <div class="ali-h">
+              <div class="ali-ic">📰</div>
+              <div>
+                <div class="ali-cat">Diario regional</div>
+                <h5>El Colombiano · sección Vivir</h5>
+              </div>
+            </div>
+            <p>Cobertura local sobre tecnología, vivienda y sostenibilidad. Llega tanto al Explorador Informado como al
+              tomador de decisión B2B.</p>
+            <div class="ali-aport"><strong>Aporte:</strong> reportajes de "innovación paisa" + cobertura de Feria del
+              Diseño desde un ángulo regional.</div>
+          </div>
+          <div class="ali pr">
+            <div class="ali-h">
+              <div class="ali-ic">🏛️</div>
+              <div>
+                <div class="ali-cat">Gremio · B2B</div>
+                <h5>Camacol Antioquia · Portafolio</h5>
+              </div>
+            </div>
+            <p>Camacol como gremio constructor convoca y certifica. Portafolio como medio nacional de negocios da escala
+              a la propuesta.</p>
+            <div class="ali-aport"><strong>Aporte:</strong> dos puertas a Arturo González: una gremial (cercanía) y otra
+              periodística (credibilidad).</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="act-link"><strong>Responsable</strong>Mateo · productor y editor. Cada grabación principal genera 4-5 piezas derivadas.</div>
-  </div>
-  <div class="act">
-    <div class="act-n">03</div>
-    <div class="act-c">
-      <h5>Gestión multicanal y community management</h5>
-      <p>Publicación coordinada en Instagram, LinkedIn, YouTube Shorts y WhatsApp Canal. Moderación de comentarios y DMs (tiempo de respuesta &lt;4h). Dinamización del Canal con audios de Carlos. Activación de stickers, polls y trivias en Stories.</p>
+    <div class="ft"><span>Eventos y prensa · Lo digital se valida fuera de la pantalla</span>
+      <div class="ft-r"><span class="ft-pill">06 / 24</span></div>
     </div>
-    <div class="act-link"><strong>Responsable</strong>Ioav · community manager y copywriter. Voz cercana, pedagógica, sin tecnicismos.</div>
-  </div>
-  <div class="act">
-    <div class="act-n">04</div>
-    <div class="act-c">
-      <h5>Análisis de métricas y optimización del embudo</h5>
-      <p>Seguimiento semanal de los 24 KPIs definidos en Entrega 3 (alcance, sesiones web, contactos WhatsApp, leads B2B, suscriptores Canal, NPS). Iteración del contenido según performance. Ajuste de pauta según rendimiento por etapa del embudo.</p>
+  </section>
+
+  <!-- ═══ S7 · ALIADOS TECNOLÓGICOS ═══ -->
+  <section class="s dk" id="s7">
+    <div class="strip sb"></div>
+    <div class="lbl an"><span class="pip"></span> Bloque 01 · Infraestructura digital</div>
+    <h2 class="tt an d1">Plataformas que <em>sostienen el producto <span class="hi">y la historia</span>.</em></h2>
+    <p class="sub an d2" style="margin-bottom:14px;">Estas alianzas son técnicas, pero su rol es transmedia: <strong
+        style="color:var(--primario);font-weight:700;">sin Meta no hay Instagram; sin LinkedIn no hay narrativa B2B; sin
+        Amazon/Google no hay control por voz.</strong> i-Homotic desarrolló su propia librería para no depender de SDKs
+      costosos, pero la plataforma de distribución sigue siendo de terceros.</p>
+    <div class="g4 an d3">
+      <div class="card c-darker">
+        <div class="card-icon">🗣️</div>
+        <span class="tag">Producto</span>
+        <h4>Amazon · Google · Apple</h4>
+        <p>Asistentes Alexa, Google Assistant y Siri. i-Homotic desarrolló <strong
+            style="color:var(--primario);">librería propia</strong> para comunicar sin pagar SDKs.</p>
+      </div>
+      <div class="card c-darker">
+        <div class="card-icon">📱</div>
+        <span class="tag">Distribución B2C</span>
+        <h4>Meta Business</h4>
+        <p>Instagram + WhatsApp Business + Canal de WhatsApp. Núcleo de la atracción B2C y de la fidelización cálida.
+        </p>
+      </div>
+      <div class="card c-darker">
+        <div class="card-icon">💼</div>
+        <span class="tag">Distribución B2B</span>
+        <h4>LinkedIn</h4>
+        <p>Atracción profesional ante Arturo González. Pauta en posts de cierre de Q3 + save the dates de Feria.</p>
+      </div>
+      <div class="card c-darker">
+        <div class="card-icon">🔍</div>
+        <span class="tag">Descubrimiento</span>
+        <h4>Google · YouTube Shorts</h4>
+        <p>SEO de "qué es domótica" + Shorts educativos de 60s. Primera puerta de entrada antes que el cliente sepa que
+          i-Homotic existe.</p>
+      </div>
     </div>
-    <div class="act-link"><strong>Responsable</strong>Equipo completo · revisión semanal de tablero compartido.</div>
-  </div>
-  <div class="act">
-    <div class="act-n">05</div>
-    <div class="act-c">
-      <h5>Coordinación de aliados y activación física</h5>
-      <p>Programación de entrevistas con arquitectos aliados, agenda de propietarios para testimonios, coordinación de stand en Feria del Diseño, demos en showroom (15 y 45 min para B2B), gestión del check-in exclusivo del WhatsApp Canal en el stand.</p>
+    <div class="stmt st-dark an d4" style="margin-top:18px;">
+      <strong>Lectura estratégica:</strong> i-Homotic es independiente en lo técnico (firmware, software y librería
+      propios) pero <strong>interdependiente en la distribución narrativa</strong>. Por eso la pauta y el orgánico deben
+      combinarse con prudencia: no se construye una marca encima de algoritmos que pueden cambiar.
     </div>
-    <div class="act-link"><strong>Responsable</strong>Equipo + Carlos · puente entre lo digital y lo físico.</div>
-  </div>
-</div>
-<div class="ft"><span>Actividades clave · Cinco engranajes que mueven el universo</span><div class="ft-r"><span class="ft-pill">09 / 24</span></div></div>
-</section>
-
-<!-- ═══ S10 · PRODUCCIÓN DE CONTENIDO + PARRILLA ═══ -->
-<section class="s dk" id="s10">
-<div class="strip sg"></div>
-<div class="lbl an"><span class="pip"></span> Bloque 02 · Actividad #02 en detalle</div>
-<h2 class="tt an d1">Producción de contenido <em>—la columna<br>vertebral de <span class="hi">"Mi Casa Paso a Paso"</span>.</em></h2>
-<p class="sub an d2" style="margin-bottom:12px;">60 contenidos en 13 semanas, distribuidos por etapa del embudo y arco mensual. La producción no es un calendario plano: es <strong style="color:var(--primario);font-weight:700;">una narrativa con principio, nudo y desenlace</strong> que escala hacia la Feria del Diseño.</p>
-<div class="parrilla an d3">
-  <div class="pq atr">A</div><div class="pq atr">A</div><div class="pq atr">A</div><div class="pq atr">A</div><div class="pq atr">A</div>
-  <div class="pq con">C</div><div class="pq con">C</div><div class="pq con">C</div><div class="pq con">C</div>
-  <div class="pq conv">V</div><div class="pq fer">★ FERIA</div><div class="pq conv">V</div><div class="pq fid">F</div>
-</div>
-<div class="parrilla-leg an d4">
-  <span class="l-a">Julio — Acto 1: Desmitificar</span>
-  <span class="l-c">Agosto — Acto 2: Evidenciar</span>
-  <span class="l-v">Septiembre — Acto 3: Activar</span>
-  <span class="l-fe">Semana 11 — Feria del Diseño</span>
-  <span class="l-f">Cierre — Fidelización</span>
-</div>
-<div class="g4 an d5" style="margin-top:14px;">
-  <div class="card c-dark">
-    <div class="card-icon">🎬</div>
-    <span class="tag">26 piezas</span>
-    <h4>Instagram feed</h4>
-    <p>Reels FAQ, carruseles pedagógicos, antes/después, save the dates. 2 publicaciones por semana.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">💼</div>
-    <span class="tag">13 piezas</span>
-    <h4>LinkedIn B2B</h4>
-    <p>Datos del mercado, casos de estudio, voces de aliados, invitaciones a demos. 1 post semanal.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">▶️</div>
-    <span class="tag">7 shorts</span>
-    <h4>YouTube Shorts</h4>
-    <p>Microeducación 30-60s. Reemplaza los mini-documentales costosos del plan original.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">💬</div>
-    <span class="tag">6 + 8 series</span>
-    <h4>WhatsApp + Stories</h4>
-    <p>1 mensaje semanal exclusivo + 1 serie semanal de Stories interactivas con polls.</p>
-  </div>
-</div>
-<div class="ft"><span>Producción · 60 contenidos en 13 semanas</span><div class="ft-r"><span class="ft-pill">10 / 24</span></div></div>
-</section>
-
-<!-- ═══ S11 · GESTIÓN MULTICANAL ═══ -->
-<section class="s dk" id="s11">
-<div class="strip sg"></div>
-<div class="lbl an"><span class="pip"></span> Bloque 02 · Actividad #03 en detalle</div>
-<h2 class="tt an d1">Gestión multicanal <em>—cada plataforma <span class="hi">tiene su voz</span>.</em></h2>
-<p class="sub an d2" style="margin-bottom:14px;">No basta con publicar lo mismo en todos los canales. Cada plataforma tiene una temperatura, un tono y un rol dentro del embudo. <strong style="color:var(--primario);font-weight:700;">La actividad clave es traducir el universo a cada lenguaje.</strong></p>
-<div class="g4 an d3">
-  <div class="card c-dark">
-    <div class="card-icon" style="color:var(--primario);">📷</div>
-    <span class="tag">Atracción + Consideración</span>
-    <h4>Instagram</h4>
-    <p><strong style="color:var(--primario);">Voz:</strong> Sabio + Cuidador. Estético, cercano, pedagógico.</p>
-    <p style="margin-top:6px;"><strong style="color:var(--primario);">Actividad clave:</strong> 2 publicaciones/sem + Stories interactivas. CTA al link en bio.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon" style="color:var(--secundario-l);">💼</div>
-    <span class="tag">Atracción B2B + Conversión</span>
-    <h4>LinkedIn</h4>
-    <p><strong style="color:var(--secundario-l);">Voz:</strong> Sabio + Creador. Profesional, técnico, datos antes que adjetivos.</p>
-    <p style="margin-top:6px;"><strong style="color:var(--secundario-l);">Actividad clave:</strong> 1 post/sem + DMs personalizados a Arturo González.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon" style="color:#D97706;">▶️</div>
-    <span class="tag">Descubrimiento SEO</span>
-    <h4>YouTube Shorts</h4>
-    <p><strong style="color:#F59E0B;">Voz:</strong> Sabio puro. Directo, didáctico, hook en 3 segundos.</p>
-    <p style="margin-top:6px;"><strong style="color:#F59E0B;">Actividad clave:</strong> 1 Short cada 2 semanas. Reemplazo del mini-documental.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon" style="color:var(--whatsapp);">💚</div>
-    <span class="tag">Fidelización</span>
-    <h4>WhatsApp Canal</h4>
-    <p><strong style="color:var(--whatsapp);">Voz:</strong> Cuidador puro. Cálido, exclusivo, como un amigo.</p>
-    <p style="margin-top:6px;"><strong style="color:var(--whatsapp);">Actividad clave:</strong> 1 mensaje/sem + audios ocasionales del propio Carlos.</p>
-  </div>
-</div>
-<div class="stmt st-dark an d4" style="margin-top:16px;">
-  La gestión multicanal no es operativa, es <strong>una decisión narrativa</strong>. Una FAQ en Reel es cercana y aspiracional; el mismo dato en LinkedIn es técnico y verificable; en Shorts es directo y educativo. Mismo contenido, tres lecturas, tres públicos.
-</div>
-<div class="ft"><span>Gestión multicanal · Una historia, cuatro lenguajes</span><div class="ft-r"><span class="ft-pill">11 / 24</span></div></div>
-</section>
-
-<!-- ═══ S12 · MÉTRICAS Y OPTIMIZACIÓN ═══ -->
-<section class="s dk" id="s12">
-<div class="strip sp"></div>
-<div class="lbl an"><span class="pip"></span> Bloque 02 · Actividades #04 y #05</div>
-<h2 class="tt an d1">Métricas, optimización <em>y co-creación con <span class="hi">aliados</span>.</em></h2>
-<p class="sub an d2" style="margin-bottom:14px;">Sin estas dos actividades el universo se queda estático. La medición permite iterar; la co-creación con aliados garantiza que la historia <strong style="color:var(--primario);font-weight:700;">no dependa de un solo narrador</strong>.</p>
-<div class="g2 an d3">
-  <div>
-    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--primario);font-weight:700;margin-bottom:9px;">📊 Análisis y optimización</div>
-    <div class="ali">
-      <div class="ali-h"><div class="ali-ic">📈</div><div><h5>Tablero semanal de KPIs</h5></div></div>
-      <p>24 indicadores divididos por etapa del embudo: 6 de atracción, 6 de consideración, 6 de conversión, 5 de fidelización.</p>
-      <div class="ali-aport"><strong>Conexión transmedia:</strong> el contenido con peor rendimiento se reemplaza; el de mejor rendimiento se amplifica con pauta.</div>
+    <div class="ft"><span>Aliados tecnológicos · La capa invisible</span>
+      <div class="ft-r"><span class="ft-pill">07 / 24</span></div>
     </div>
-    <div class="ali" style="margin-top:9px;">
-      <div class="ali-h"><div class="ali-ic">🎯</div><div><h5>Reasignación de pauta</h5></div></div>
-      <p>El presupuesto de Meta Ads y LinkedIn Ads se concentra en las semanas 10-12 (Feria) y en piezas que ya validaron orgánicamente.</p>
-      <div class="ali-aport"><strong>Conexión transmedia:</strong> la pauta amplifica lo que ya funciona, no rescata lo que falla.</div>
+  </section>
+
+  <!-- ═══ S8 · DIVIDER 02: ACTIVIDADES ═══ -->
+  <section class="s dk" id="s8" style="align-items:center;text-align:center;">
+    <div class="bg-p"></div>
+    <div class="divn">02</div>
+    <div class="lbl an"><span class="pip"></span> Bloque 02</div>
+    <h2 class="tt an d1" style="font-size:clamp(2.4rem,5vw,3.8rem);">Actividades<br><em>clave ⚙️</em></h2>
+    <p class="sub an d2" style="text-align:center;max-width:760px;">No las actividades del negocio (programar,
+      ensamblar, instalar). Las actividades de <strong style="color:var(--primario);font-weight:700;">comunicación
+        transmedia</strong> que hacen que la propuesta de valor llegue, se entienda y se elija — conectadas con la
+      parrilla de 60 contenidos.</p>
+    <div class="ft"><span>Actividades clave</span>
+      <div class="ft-r"><span class="ft-pill">08 / 24</span></div>
     </div>
-  </div>
-  <div>
-    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--secundario-l);font-weight:700;margin-bottom:9px;">🤝 Co-creación con aliados</div>
-    <div class="ali pr">
-      <div class="ali-h"><div class="ali-ic">🎙️</div><div><h5>Sesiones con arquitectos aliados</h5></div></div>
-      <p>1-2 entrevistas mensuales con Alex Toro, La Provenza o Peláez. Material para 1 post LinkedIn + 1 Reel + 1 Story por sesión.</p>
-      <div class="ali-aport"><strong>Adición narrativa:</strong> sus voces validan a Carlos. Sin esfuerzo de producción adicional para ellos.</div>
+  </section>
+
+  <!-- ═══ S9 · MAPA DE ACTIVIDADES ═══ -->
+  <section class="s dk" id="s9">
+    <div class="strip sg"></div>
+    <div class="lbl an"><span class="pip"></span> Bloque 02 · Mapa de actividades</div>
+    <h2 class="tt an d1">Cinco actividades <em>—un solo <span class="hi">motor narrativo</span>.</em></h2>
+    <p class="sub an d2" style="margin-bottom:14px;">Cada actividad alimenta a la siguiente: <strong
+        style="color:var(--primario);font-weight:700;">curación narrativa → producción → publicación → análisis →
+        activación con aliados</strong>. El ciclo se repite cada semana durante las 13 semanas del Q3.</p>
+    <div class="act-rib an d3">
+      <div class="act">
+        <div class="act-n">01</div>
+        <div class="act-c">
+          <h5>Curación narrativa y storytelling</h5>
+          <p>Mantenimiento del universo "Mi Casa Paso a Paso": coherencia entre los 4 ejes del pentágono (Educación,
+            Evidencia, Hogar, Comunidad, Eficiencia), guionización de Reels y Shorts, manejo de expansiones (adición
+            narrativa, espacios en blanco, agujeros de conejo).</p>
+        </div>
+        <div class="act-link"><strong>Responsable</strong>Juan Camilo · guionista y creador visual. Coherencia entre la
+          web, el manual de marca y los 60 contenidos.</div>
+      </div>
+      <div class="act">
+        <div class="act-n">02</div>
+        <div class="act-c">
+          <h5>Producción de contenido multiplataforma</h5>
+          <p>Grabación en showroom y hogares aliados (testimonios, antes/después, escenas), edición de YouTube Shorts
+            (60s), Reels de FAQ, fotografía para carruseles, captura de cobertura en vivo de la Feria del Diseño y
+            "repurposing" sistemático.</p>
+        </div>
+        <div class="act-link"><strong>Responsable</strong>Mateo · productor y editor. Cada grabación principal genera
+          4-5 piezas derivadas.</div>
+      </div>
+      <div class="act">
+        <div class="act-n">03</div>
+        <div class="act-c">
+          <h5>Gestión multicanal y community management</h5>
+          <p>Publicación coordinada en Instagram, LinkedIn, YouTube Shorts y WhatsApp Canal. Moderación de comentarios y
+            DMs (tiempo de respuesta &lt;4h). Dinamización del Canal con audios de Carlos. Activación de stickers, polls
+            y trivias en Stories.</p>
+        </div>
+        <div class="act-link"><strong>Responsable</strong>Ioav · community manager y copywriter. Voz cercana,
+          pedagógica, sin tecnicismos.</div>
+      </div>
+      <div class="act">
+        <div class="act-n">04</div>
+        <div class="act-c">
+          <h5>Análisis de métricas y optimización del embudo</h5>
+          <p>Seguimiento semanal de los 24 KPIs definidos en Entrega 3 (alcance, sesiones web, contactos WhatsApp, leads
+            B2B, suscriptores Canal, NPS). Iteración del contenido según performance. Ajuste de pauta según rendimiento
+            por etapa del embudo.</p>
+        </div>
+        <div class="act-link"><strong>Responsable</strong>Equipo completo · revisión semanal de tablero compartido.
+        </div>
+      </div>
+      <div class="act">
+        <div class="act-n">05</div>
+        <div class="act-c">
+          <h5>Coordinación de aliados y activación física</h5>
+          <p>Programación de entrevistas con arquitectos aliados, agenda de propietarios para testimonios, coordinación
+            de stand en Feria del Diseño, demos en showroom (15 y 45 min para B2B), gestión del check-in exclusivo del
+            WhatsApp Canal en el stand.</p>
+        </div>
+        <div class="act-link"><strong>Responsable</strong>Equipo + Carlos · puente entre lo digital y lo físico.</div>
+      </div>
     </div>
-    <div class="ali pr" style="margin-top:9px;">
-      <div class="ali-h"><div class="ali-ic">🏠</div><div><h5>Casos de seguimiento con propietarios</h5></div></div>
-      <p>Visitas a clientes a 6 meses de instalación. Una sola jornada de grabación genera contenido para 3 etapas del embudo.</p>
-      <div class="ali-aport"><strong>Adición narrativa:</strong> familias reales hablando = la respuesta directa al Insight 1 ("la confianza se googlea").</div>
+    <div class="ft"><span>Actividades clave · Cinco engranajes que mueven el universo</span>
+      <div class="ft-r"><span class="ft-pill">09 / 24</span></div>
     </div>
-  </div>
-</div>
-<div class="ft"><span>Métricas + co-creación · El universo se ajusta solo si tiene oídos</span><div class="ft-r"><span class="ft-pill">12 / 24</span></div></div>
-</section>
+  </section>
 
-<!-- ═══ S13 · DIVIDER 03: RELACIONES ═══ -->
-<section class="s dk" id="s13" style="align-items:center;text-align:center;">
-<div class="bg-p"></div><div class="divn">03</div>
-<div class="lbl an"><span class="pip"></span> Bloque 03</div>
-<h2 class="tt an d1" style="font-size:clamp(2.4rem,5vw,3.8rem);">Relación con<br><em>los clientes 💬</em></h2>
-<p class="sub an d2" style="text-align:center;max-width:760px;">Cada interacción cuenta una parte de la historia de marca. Para el Explorador Informado, la relación es <strong style="color:var(--primario);font-weight:700;">una conversación gradual</strong>; para Arturo González, una <strong style="color:var(--secundario-l);font-weight:700;">demostración técnica acompañada</strong>.</p>
-<div class="ft"><span>Relación con los clientes</span><div class="ft-r"><span class="ft-pill">13 / 24</span></div></div>
-</section>
-
-<!-- ═══ S14 · RELACIÓN B2C ═══ -->
-<section class="s dk" id="s14">
-<div class="strip sg"></div>
-<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
-  <div>
-    <div class="lbl an"><span class="pip"></span> Bloque 03 · B2C</div>
-    <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Una relación <span class="hi">paso a paso</span>, como compra el Explorador Informado</h2>
-  </div>
-  <div class="aud b2c an d1">Marcela Ríos · Eliana Restrepo · 30-55 años</div>
-</div>
-<p class="sub an d2" style="margin-bottom:14px;">El Explorador Informado no quiere ser perseguido. Quiere <strong style="color:var(--primario);font-weight:700;">descubrir, validar, expandir</strong>. La relación debe acompañar ese ritmo: presencia abundante en la fase de investigación, sutileza en la consideración, calidez humana al cerrar.</p>
-<div class="g3 an d3">
-  <div class="card c-dark">
-    <div class="card-icon">🌱</div>
-    <span class="tag">Tipo · Masiva pedagógica</span>
-    <h4>Atracción — Instagram + Shorts</h4>
-    <p>Voz del Sabio y del Cuidador. No vendemos: enseñamos. Cada Reel responde una pregunta que ya escribió en Google ("¿sube el recibo?", "¿toca romper paredes?").</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">🔍</div>
-    <span class="tag">Tipo · Auto-servicio guiado</span>
-    <h4>Consideración — Sitio web + carruseles</h4>
-    <p>Calculadora de ahorro, configurador modular, antes/después. El usuario navega solo; no le exigimos formulario para "verla funcionar".</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">🤝</div>
-    <span class="tag">Tipo · Personalizada humana</span>
-    <h4>Conversión — WhatsApp con Carlos</h4>
-    <p>Sin chatbots. Carlos en persona responde la cotización. El cierre se hace en showroom: ver, tocar, probar. La familia decide junta.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">💚</div>
-    <span class="tag">Tipo · Comunidad cálida</span>
-    <h4>Fidelización — WhatsApp Canal</h4>
-    <p>Tips de escena, audios de Carlos, invitaciones exclusivas. Espacio íntimo de quien ya dio el primer paso. Conversión a embajador.</p>
-  </div>
-</div>
-<div class="stmt st-green an d4" style="margin-top:16px;">
-  Insight clave para el equipo de comunicación: <strong>el Explorador Informado prefiere "encontrar" antes que "ser encontrado"</strong>. Una pauta agresiva lo aleja; un Reel pedagógico que cura su duda exacta lo invita a entrar al universo por su propia cuenta.
-</div>
-<div class="ft"><span>Relación B2C · El cliente fija el ritmo</span><div class="ft-r"><span class="ft-pill">14 / 24</span></div></div>
-</section>
-
-<!-- ═══ S15 · RELACIÓN B2B ═══ -->
-<section class="s dk" id="s15">
-<div class="strip sp"></div>
-<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
-  <div>
-    <div class="lbl an"><span class="pip"></span> Bloque 03 · B2B</div>
-    <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Una relación <span class="hi">técnica y formal</span>, con el ritmo de Arturo González</h2>
-  </div>
-  <div class="aud b2b an d1">Arturo González · Director de Innovación</div>
-</div>
-<p class="sub an d2" style="margin-bottom:14px;">Arturo no compra por impulso. Compra por <strong style="color:var(--primario);font-weight:700;">ROI demostrable y respaldo formal</strong>. La relación es de socio técnico: i-Homotic le entrega un diferencial competitivo para sus proyectos sin romper sus márgenes.</p>
-<div class="g3 an d3">
-  <div class="card c-darker">
-    <div class="card-icon" style="color:var(--secundario-l);">📊</div>
-    <span class="tag" style="background:rgba(123,90,162,.18);color:var(--secundario-l);">Tipo · Autoridad técnica</span>
-    <h4>Atracción — LinkedIn</h4>
-    <p>Datos del mercado smart home colombiano, certificaciones EDGE/LEED, casos de uso. Posts que pueda compartir con su gerente.</p>
-  </div>
-  <div class="card c-darker">
-    <div class="card-icon" style="color:var(--secundario-l);">📂</div>
-    <span class="tag" style="background:rgba(123,90,162,.18);color:var(--secundario-l);">Tipo · Material formal</span>
-    <h4>Consideración — Fichas y casos</h4>
-    <p>PDF descargables con especificaciones, ROI por unidad, garantías. Material que pueda llevar a comité directivo.</p>
-  </div>
-  <div class="card c-darker">
-    <div class="card-icon" style="color:var(--secundario-l);">🤝</div>
-    <span class="tag" style="background:rgba(123,90,162,.18);color:var(--secundario-l);">Tipo · Demo agendada</span>
-    <h4>Conversión — Showroom + reunión</h4>
-    <p>Demos técnicas de 15 o 45 min en showroom. Carlos explica la integración con planos eléctricos del proyecto. Propuesta formal por escrito.</p>
-  </div>
-  <div class="card c-darker">
-    <div class="card-icon" style="color:var(--secundario-l);">🔁</div>
-    <span class="tag" style="background:rgba(123,90,162,.18);color:var(--secundario-l);">Tipo · Acompañamiento</span>
-    <h4>Fidelización — Proyectos repetidos</h4>
-    <p>Carlos como acompañante permanente del proyecto. Soporte postventa que reduce el riesgo de queja del comprador final.</p>
-  </div>
-</div>
-<div class="stmt st-purple an d4" style="margin-top:16px;">
-  Diferencia crítica con B2C: <strong>el ciclo de decisión es largo (fase de diseño del proyecto, no después)</strong> y la relación se sostiene antes, durante y después de la venta. La fidelización B2B no es contenido —es resultado en obra.
-</div>
-<div class="ft"><span>Relación B2B · Socio técnico, no proveedor</span><div class="ft-r"><span class="ft-pill">15 / 24</span></div></div>
-</section>
-
-<!-- ═══ S16 · EMBUDO Y NARRATIVA ═══ -->
-<section class="s dk" id="s16">
-<div class="strip sb"></div>
-<div class="lbl an"><span class="pip"></span> Bloque 03 · Síntesis</div>
-<h2 class="tt an d1">Cada etapa del embudo <em>cuenta <span class="hi">una parte distinta</span> de la historia.</em></h2>
-<p class="sub an d2" style="margin-bottom:14px;">Esta tabla resume cómo cambia la relación —y la voz— por etapa, para los dos públicos. <strong style="color:var(--primario);font-weight:700;">Atracción es alcance; fidelización es comunidad.</strong> El contenido y la voz cambian, pero el universo es el mismo.</p>
-<div class="fnl an d3">
-  <div class="fnl-h">Etapa</div>
-  <div class="fnl-h">Relación B2C — Marcela / Eliana</div>
-  <div class="fnl-h">Relación B2B — Arturo</div>
-
-  <div class="fnl-row">
-    <div class="stage">Atracción<span class="pct">45 %</span></div>
-    <div class="b2c-cell"><strong>Pedagógica masiva.</strong> Reels FAQ y carruseles que responden búsquedas en Google. Sin pedir nada a cambio.</div>
-    <div class="b2b-cell"><strong>Autoridad técnica.</strong> Posts en LinkedIn con datos verificables del sector. Material descargable.</div>
-  </div>
-  <div class="fnl-row">
-    <div class="stage">Consideración<span class="pct">30 %</span></div>
-    <div class="b2c-cell"><strong>Auto-servicio visual.</strong> Sitio web con calculadora, antes/después, testimonios. Tiempo en sitio &gt;1:30 min.</div>
-    <div class="b2b-cell"><strong>Diálogo formal.</strong> Casos de estudio con ROI, fichas técnicas en PDF y entrevistas con arquitectos aliados.</div>
-  </div>
-  <div class="fnl-row">
-    <div class="stage">Conversión<span class="pct">15 %</span></div>
-    <div class="b2c-cell"><strong>Humana directa.</strong> WhatsApp con Carlos. Demo en showroom. La familia decide junta tras visita.</div>
-    <div class="b2b-cell"><strong>Demo técnica agendada.</strong> 15 o 45 min en showroom. Propuesta escrita con integración a planos del proyecto.</div>
-  </div>
-  <div class="fnl-row">
-    <div class="stage">Fidelización<span class="pct">10 %</span></div>
-    <div class="b2c-cell"><strong>Comunidad íntima.</strong> WhatsApp Canal con audios de Carlos, tips de escena, invitaciones exclusivas a Feria.</div>
-    <div class="b2b-cell"><strong>Socio recurrente.</strong> Acompañamiento permanente. Postventa que asegura siguientes proyectos del mismo cliente.</div>
-  </div>
-</div>
-<div class="ft"><span>Embudo narrativo · Una historia, dos lecturas</span><div class="ft-r"><span class="ft-pill">16 / 24</span></div></div>
-</section>
-
-<!-- ═══ S17 · DIVIDER 04: COSTOS ═══ -->
-<section class="s dk" id="s17" style="align-items:center;text-align:center;">
-<div class="bg-p"></div><div class="divn">04</div>
-<div class="lbl an"><span class="pip"></span> Bloque 04</div>
-<h2 class="tt an d1" style="font-size:clamp(2.4rem,5vw,3.8rem);">Estructura<br><em>de costos 💸</em></h2>
-<p class="sub an d2" style="text-align:center;max-width:760px;">Estimación de los costos de la <strong style="color:var(--primario);font-weight:700;">estrategia transmedia Q3 2026</strong> —no los del negocio entero. Cinco grandes categorías con peso relativo y rangos en COP por trimestre.</p>
-<div class="ft"><span>Estructura de costos</span><div class="ft-r"><span class="ft-pill">17 / 24</span></div></div>
-</section>
-
-<!-- ═══ S18 · DISTRIBUCIÓN COSTOS ═══ -->
-<section class="s dk" id="s18">
-<div class="strip sg"></div>
-<div class="lbl an"><span class="pip"></span> Bloque 04 · Distribución Q3 2026</div>
-<h2 class="tt an d1">Cinco frentes de inversión <em>—la mayoría<br>en <span class="hi">producción y talento</span>.</em></h2>
-<p class="sub an d2" style="margin-bottom:14px;">Estos rangos asumen un equipo de 3 estudiantes EAFIT + Carlos + apoyos puntuales. El equipo de producción y la propiedad del showroom <strong style="color:var(--primario);font-weight:700;">reducen significativamente los costos</strong> respecto a contratar una agencia externa.</p>
-<div class="an d3" style="margin-top:6px;">
-  <div class="cb">
-    <div class="cb-lbl"><span class="ic">🎬</span> Producción audiovisual y diseño</div>
-    <div class="cb-bar"><div class="cb-fill f1" style="width:35%;">35 %</div></div>
-    <div class="cb-val">$10–12M COP</div>
-  </div>
-  <div class="cb">
-    <div class="cb-lbl"><span class="ic">👥</span> Personal y honorarios</div>
-    <div class="cb-bar"><div class="cb-fill f2" style="width:25%;">25 %</div></div>
-    <div class="cb-val">$7–9M COP</div>
-  </div>
-  <div class="cb">
-    <div class="cb-lbl"><span class="ic">📣</span> Pauta digital (Meta + LinkedIn + Google)</div>
-    <div class="cb-bar"><div class="cb-fill f3" style="width:20%;">20 %</div></div>
-    <div class="cb-val">$5–7M COP</div>
-  </div>
-  <div class="cb">
-    <div class="cb-lbl"><span class="ic">🎪</span> Activación física · Feria del Diseño</div>
-    <div class="cb-bar"><div class="cb-fill f4" style="width:13%;">13 %</div></div>
-    <div class="cb-val">$3–4M COP</div>
-  </div>
-  <div class="cb">
-    <div class="cb-lbl"><span class="ic">🛠️</span> Herramientas y plataformas digitales</div>
-    <div class="cb-bar"><div class="cb-fill f5" style="width:7%;">7 %</div></div>
-    <div class="cb-val">$1.5–2M COP</div>
-  </div>
-</div>
-<div class="cost-sum an d4" style="margin-top:14px;">
-  <div><div class="cs-lbl">Inversión total estimada Q3 2026</div><div class="cs-val">$26.5 – 34 M COP</div></div>
-  <div class="cs-note">Estimación trimestral —no anual. Excluye costos operativos del negocio (hardware, instalación, oficina, soporte técnico postventa) que ya están cubiertos por el flujo de caja existente de GELECT.</div>
-</div>
-<div class="ft"><span>Distribución de inversión Q3 2026</span><div class="ft-r"><span class="ft-pill">18 / 24</span></div></div>
-</section>
-
-<!-- ═══ S19 · OPTIMIZACIÓN ═══ -->
-<section class="s dk" id="s19">
-<div class="strip sg"></div>
-<div class="lbl an"><span class="pip"></span> Bloque 04 · Optimización</div>
-<h2 class="tt an d1">Cuáles costos <em>son críticos —y cómo <span class="hi">optimizarlos</span>.</em></h2>
-<p class="sub an d2" style="margin-bottom:14px;">La mayor palanca de eficiencia es <strong style="color:var(--primario);font-weight:700;">producir con activos propios</strong>: showroom como locación, equipo del semillero EAFIT como talento, librería propia como reemplazo de SDKs pagos.</p>
-<div class="g3 an d3">
-  <div class="card c-dark">
-    <div class="card-icon">🎬</div>
-    <span class="tag">Costo crítico #1</span>
-    <h4>Producción audiovisual</h4>
-    <p>Cámara, audio, edición de 60 piezas + cobertura de Feria. <strong style="color:var(--primario);">Optimización:</strong> showroom como locación recurrente + repurposing (1 grabación = 4-5 piezas).</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">📣</div>
-    <span class="tag">Costo crítico #2</span>
-    <h4>Pauta digital concentrada</h4>
-    <p>Meta + LinkedIn + Google Ads. <strong style="color:var(--primario);">Optimización:</strong> 70% de la pauta entre semanas 9-12 (Feria + cierre Q3). Pauta solo sobre piezas ya validadas orgánicamente.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">🎪</div>
-    <span class="tag">Costo crítico #3</span>
-    <h4>Stand Feria del Diseño</h4>
-    <p>3 días en Plaza Mayor + material POP + adecuación. <strong style="color:var(--primario);">Optimización:</strong> productos del showroom como stand modular + brochures impresos en cantidades calculadas (no excedente).</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">👥</div>
-    <span class="tag">Optimización transversal</span>
-    <h4>Talento del semillero EAFIT</h4>
-    <p>Equipo Mateo + Ioav + Juan Camilo como base de producción. <strong style="color:var(--primario);">Beneficio:</strong> 60-70% del costo que tendría una agencia mediana en Medellín.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">🏠</div>
-    <span class="tag">Optimización transversal</span>
-    <h4>Showroom como activo dual</h4>
-    <p>Mismo espacio sirve como <strong style="color:var(--primario);">(1)</strong> locación de grabación, <strong style="color:var(--primario);">(2)</strong> punto de demo B2B, <strong style="color:var(--primario);">(3)</strong> contenido de Reels recurrente.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">⚙️</div>
-    <span class="tag">Optimización transversal</span>
-    <h4>Librería propia (no SDK)</h4>
-    <p>i-Homotic desarrolló su propia comunicación con Alexa/Google/Siri. <strong style="color:var(--primario);">Beneficio:</strong> cero pago de licencias recurrentes, lo cual también es la propuesta de valor.</p>
-  </div>
-</div>
-<div class="ft"><span>Optimización · Eficiencia es coherencia con la propuesta</span><div class="ft-r"><span class="ft-pill">19 / 24</span></div></div>
-</section>
-
-<!-- ═══ S20 · DIVIDER 05: INGRESOS ═══ -->
-<section class="s dk" id="s20" style="align-items:center;text-align:center;">
-<div class="bg-p"></div><div class="divn">05</div>
-<div class="lbl an"><span class="pip"></span> Bloque 05</div>
-<h2 class="tt an d1" style="font-size:clamp(2.4rem,5vw,3.8rem);">Fuentes<br><em>de ingresos 💰</em></h2>
-<p class="sub an d2" style="text-align:center;max-width:760px;">Cómo i-Homotic <strong style="color:var(--primario);font-weight:700;">captura valor económico</strong> a través de venta directa B2C, alianzas B2B y expansión internacional. Sin mensualidades. Sin SaaS. Sin dependencias recurrentes.</p>
-<div class="ft"><span>Fuentes de ingresos</span><div class="ft-r"><span class="ft-pill">20 / 24</span></div></div>
-</section>
-
-<!-- ═══ S21 · INGRESOS B2C ═══ -->
-<section class="s dk" id="s21">
-<div class="strip sg"></div>
-<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
-  <div>
-    <div class="lbl an"><span class="pip"></span> Bloque 05 · B2C</div>
-    <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Venta directa <span class="hi">paso a paso</span>—como compra el Explorador Informado</h2>
-  </div>
-  <div class="aud b2c an d1">B2C · Marcela Ríos</div>
-</div>
-<p class="sub an d2" style="margin-bottom:14px;">El comportamiento de compra del usuario (validar, probar, expandir) define el modelo de ingreso: <strong style="color:var(--primario);font-weight:700;">paquetes modulares por habitación o por función</strong>, no contratos cerrados ni mensualidades. El cliente paga una sola vez por etapa y vuelve cuando quiere expandir.</p>
-<div class="g3 an d3">
-  <div class="rev">
-    <div class="rev-h"><div class="rev-ic">💡</div><div><div class="rev-cat">Punto de entrada</div><h5>Paquete por función</h5></div></div>
-    <div class="rev-amt">$3 – 8M COP</div>
-    <p>Iluminación inteligente o clima o seguridad — uno solo, instalado. Es el "primer paso" al que invita la narrativa transmedia.</p>
-  </div>
-  <div class="rev">
-    <div class="rev-h"><div class="rev-ic">🏠</div><div><div class="rev-cat">Apartamento integral</div><h5>Paquete por habitación o casa</h5></div></div>
-    <div class="rev-amt">$15 – 40M COP</div>
-    <p>Iluminación + clima + seguridad + escenas. El paquete clásico para el cliente que ya validó la marca y compra todo de una vez.</p>
-  </div>
-  <div class="rev">
-    <div class="rev-h"><div class="rev-ic">📦</div><div><div class="rev-cat">Expansión gradual</div><h5>Dispositivos sueltos</h5></div></div>
-    <div class="rev-amt">$200K – 2M COP</div>
-    <p>Switches, sensores, cámaras adicionales. El cliente que ya tiene iluminación vuelve por seguridad. Recompra sin mensualidad.</p>
-  </div>
-  <div class="rev">
-    <div class="rev-h"><div class="rev-ic">🔧</div><div><div class="rev-cat">Servicio</div><h5>Instalación y capacitación</h5></div></div>
-    <div class="rev-amt">$500K – 3M COP</div>
-    <p>Cableado UTP de bajo voltaje, programación de escenas, capacitación a la familia. Se incluye en paquete o se vende por hora.</p>
-  </div>
-  <div class="rev">
-    <div class="rev-h"><div class="rev-ic">⚡</div><div><div class="rev-cat">Add-on sostenibilidad</div><h5>Integración con energía solar</h5></div></div>
-    <div class="rev-amt">$2 – 5M COP</div>
-    <p>Para hogares que ya tienen paneles (o piensan instalarlos). La domótica de 12-24V se conecta directo sin transformadores.</p>
-  </div>
-  <div class="rev">
-    <div class="rev-h"><div class="rev-ic">🛟</div><div><div class="rev-cat">Postventa</div><h5>Soporte premium opcional</h5></div></div>
-    <div class="rev-amt">$300K – 800K COP/año</div>
-    <p>Soporte priorizado (no obligatorio, no mensual). Coherente con el principio de "cero costos recurrentes" como diferencial.</p>
-  </div>
-</div>
-<div class="ft"><span>Ingresos B2C · Sin mensualidades, sin SaaS, sin candado</span><div class="ft-r"><span class="ft-pill">21 / 24</span></div></div>
-</section>
-
-<!-- ═══ S22 · INGRESOS B2B + EXPANSIÓN ═══ -->
-<section class="s dk" id="s22">
-<div class="strip sp"></div>
-<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
-  <div>
-    <div class="lbl an"><span class="pip"></span> Bloque 05 · B2B + Expansión</div>
-    <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Volumen, prescripción y <span class="hi">mercado internacional</span></h2>
-  </div>
-  <div class="aud b2b an d1">B2B · Arturo González</div>
-</div>
-<p class="sub an d2" style="margin-bottom:14px;">El B2B no replica el B2C: <strong style="color:var(--primario);font-weight:700;">aquí se venden volúmenes con precio diferenciado</strong> y la fidelización vale más que el ticket inicial. La expansión internacional es la apuesta de mayor potencial: el switch i-Homotic cuesta 25 USD vs. 87 USD en EE.UU.</p>
-<div class="g2 an d3">
-  <div>
-    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--secundario-l);font-weight:700;margin-bottom:9px;">🏗️ Modelos B2B</div>
-    <div class="rev pr">
-      <div class="rev-h"><div class="rev-ic">🏢</div><div><div class="rev-cat">Núcleo B2B</div><h5>Venta por volumen a constructoras</h5></div></div>
-      <div class="rev-amt">$50M – $500M COP/proyecto</div>
-      <p>Paquetes de 50+ unidades preinstaladas. Precio unitario menor, ticket total mucho mayor. Carlos coordina con departamento eléctrico de la constructora.</p>
+  <!-- ═══ S10 · PRODUCCIÓN DE CONTENIDO + PARRILLA ═══ -->
+  <section class="s dk" id="s10">
+    <div class="strip sg"></div>
+    <div class="lbl an"><span class="pip"></span> Bloque 02 · Actividad #02 en detalle</div>
+    <h2 class="tt an d1">Producción de contenido <em>—la columna<br>vertebral de <span class="hi">"Mi Casa Paso a
+          Paso"</span>.</em></h2>
+    <p class="sub an d2" style="margin-bottom:12px;">60 contenidos en 13 semanas, distribuidos por etapa del embudo y
+      arco mensual. La producción no es un calendario plano: es <strong
+        style="color:var(--primario);font-weight:700;">una narrativa con principio, nudo y desenlace</strong> que escala
+      hacia la Feria del Diseño.</p>
+    <div class="parrilla an d3">
+      <div class="pq atr">A</div>
+      <div class="pq atr">A</div>
+      <div class="pq atr">A</div>
+      <div class="pq atr">A</div>
+      <div class="pq atr">A</div>
+      <div class="pq con">C</div>
+      <div class="pq con">C</div>
+      <div class="pq con">C</div>
+      <div class="pq con">C</div>
+      <div class="pq conv">V</div>
+      <div class="pq fer">★ FERIA</div>
+      <div class="pq conv">V</div>
+      <div class="pq fid">F</div>
     </div>
-    <div class="rev pr" style="margin-top:9px;">
-      <div class="rev-h"><div class="rev-ic">📐</div><div><div class="rev-cat">Prescripción</div><h5>Comisión por arquitecto referenciador</h5></div></div>
-      <div class="rev-amt">5 – 10 % del proyecto</div>
-      <p>Firmas como Alex Toro, Peláez o La Provenza reciben comisión sobre proyectos cerrados gracias a su prescripción. Modelo de incentivo mutuo.</p>
+    <div class="parrilla-leg an d4">
+      <span class="l-a">Julio — Acto 1: Desmitificar</span>
+      <span class="l-c">Agosto — Acto 2: Evidenciar</span>
+      <span class="l-v">Septiembre — Acto 3: Activar</span>
+      <span class="l-fe">Semana 11 — Feria del Diseño</span>
+      <span class="l-f">Cierre — Fidelización</span>
     </div>
-    <div class="rev pr" style="margin-top:9px;">
-      <div class="rev-h"><div class="rev-ic">🎓</div><div><div class="rev-cat">Servicio asociado</div><h5>Capacitación a fuerza de ventas</h5></div></div>
-      <div class="rev-amt">$2 – 5M COP/sesión</div>
-      <p>i-Homotic capacita a los vendedores de la constructora para que sepan vender "apartamento domótico" como diferencial.</p>
+    <div class="g4 an d5" style="margin-top:14px;">
+      <div class="card c-dark">
+        <div class="card-icon">🎬</div>
+        <span class="tag">26 piezas</span>
+        <h4>Instagram feed</h4>
+        <p>Reels FAQ, carruseles pedagógicos, antes/después, save the dates. 2 publicaciones por semana.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">💼</div>
+        <span class="tag">13 piezas</span>
+        <h4>LinkedIn B2B</h4>
+        <p>Datos del mercado, casos de estudio, voces de aliados, invitaciones a demos. 1 post semanal.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">▶️</div>
+        <span class="tag">7 shorts</span>
+        <h4>YouTube Shorts</h4>
+        <p>Microeducación 30-60s. Reemplaza los mini-documentales costosos del plan original.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">💬</div>
+        <span class="tag">6 + 8 series</span>
+        <h4>WhatsApp + Stories</h4>
+        <p>1 mensaje semanal exclusivo + 1 serie semanal de Stories interactivas con polls.</p>
+      </div>
     </div>
-  </div>
-  <div>
-    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--primario);font-weight:700;margin-bottom:9px;">🌎 Expansión internacional</div>
-    <div class="rev">
-      <div class="rev-h"><div class="rev-ic">🇺🇸</div><div><div class="rev-cat">Exportación · Activo</div><h5>Constructora en Orlando (Miami)</h5></div></div>
-      <div class="rev-amt">Margen ~3× COP local</div>
-      <p>Contacto activo con constructora en Orlando. La ventaja de precio es real: switch de i-Homotic ≈ 25 USD vs 87 USD en mercado estadounidense.</p>
+    <div class="ft"><span>Producción · 60 contenidos en 13 semanas</span>
+      <div class="ft-r"><span class="ft-pill">10 / 24</span></div>
     </div>
-    <div class="rev" style="margin-top:9px;">
-      <div class="rev-h"><div class="rev-ic">🌉</div><div><div class="rev-cat">Exploración</div><h5>Interesado en San Francisco</h5></div></div>
-      <div class="rev-amt">Por explorar</div>
-      <p>Contacto inicial sin proyecto formal. Requiere consolidar primero presencia digital robusta antes de avanzar (responde directamente al Insight 1).</p>
+  </section>
+
+  <!-- ═══ S11 · GESTIÓN MULTICANAL ═══ -->
+  <section class="s dk" id="s11">
+    <div class="strip sg"></div>
+    <div class="lbl an"><span class="pip"></span> Bloque 02 · Actividad #03 en detalle</div>
+    <h2 class="tt an d1">Gestión multicanal <em>—cada plataforma <span class="hi">tiene su voz</span>.</em></h2>
+    <p class="sub an d2" style="margin-bottom:14px;">No basta con publicar lo mismo en todos los canales. Cada
+      plataforma tiene una temperatura, un tono y un rol dentro del embudo. <strong
+        style="color:var(--primario);font-weight:700;">La actividad clave es traducir el universo a cada
+        lenguaje.</strong></p>
+    <div class="g4 an d3">
+      <div class="card c-dark">
+        <div class="card-icon" style="color:var(--primario);">📷</div>
+        <span class="tag">Atracción + Consideración</span>
+        <h4>Instagram</h4>
+        <p><strong style="color:var(--primario);">Voz:</strong> Sabio + Cuidador. Estético, cercano, pedagógico.</p>
+        <p style="margin-top:6px;"><strong style="color:var(--primario);">Actividad clave:</strong> 2 publicaciones/sem
+          + Stories interactivas. CTA al link en bio.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon" style="color:var(--secundario-l);">💼</div>
+        <span class="tag">Atracción B2B + Conversión</span>
+        <h4>LinkedIn</h4>
+        <p><strong style="color:var(--secundario-l);">Voz:</strong> Sabio + Creador. Profesional, técnico, datos antes
+          que adjetivos.</p>
+        <p style="margin-top:6px;"><strong style="color:var(--secundario-l);">Actividad clave:</strong> 1 post/sem + DMs
+          personalizados a Arturo González.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon" style="color:#D97706;">▶️</div>
+        <span class="tag">Descubrimiento SEO</span>
+        <h4>YouTube Shorts</h4>
+        <p><strong style="color:#F59E0B;">Voz:</strong> Sabio puro. Directo, didáctico, hook en 3 segundos.</p>
+        <p style="margin-top:6px;"><strong style="color:#F59E0B;">Actividad clave:</strong> 1 Short cada 2 semanas.
+          Reemplazo del mini-documental.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon" style="color:var(--whatsapp);">💚</div>
+        <span class="tag">Fidelización</span>
+        <h4>WhatsApp Canal</h4>
+        <p><strong style="color:var(--whatsapp);">Voz:</strong> Cuidador puro. Cálido, exclusivo, como un amigo.</p>
+        <p style="margin-top:6px;"><strong style="color:var(--whatsapp);">Actividad clave:</strong> 1 mensaje/sem +
+          audios ocasionales del propio Carlos.</p>
+      </div>
     </div>
-    <div class="rev" style="margin-top:9px;">
-      <div class="rev-h"><div class="rev-ic">🏷️</div><div><div class="rev-cat">Futuro · Long-tail</div><h5>Licenciamiento / White-label</h5></div></div>
-      <div class="rev-amt">Por modelar</div>
-      <p>Posibilidad de licenciar el firmware y la librería a empresas locales de otros países que ensamblan su propio hardware. Modelo de royalty.</p>
+    <div class="stmt st-dark an d4" style="margin-top:16px;">
+      La gestión multicanal no es operativa, es <strong>una decisión narrativa</strong>. Una FAQ en Reel es cercana y
+      aspiracional; el mismo dato en LinkedIn es técnico y verificable; en Shorts es directo y educativo. Mismo
+      contenido, tres lecturas, tres públicos.
     </div>
-  </div>
-</div>
-<div class="ft"><span>Ingresos B2B + expansión · El verdadero múltiplo del modelo</span><div class="ft-r"><span class="ft-pill">22 / 24</span></div></div>
-</section>
+    <div class="ft"><span>Gestión multicanal · Una historia, cuatro lenguajes</span>
+      <div class="ft-r"><span class="ft-pill">11 / 24</span></div>
+    </div>
+  </section>
 
-<!-- ═══ S23 · CIERRE CANVAS + TRANSMEDIA ═══ -->
-<section class="s nv" id="s23">
-<div class="grid-bg"></div>
-<div class="glow" style="width:520px;height:520px;top:-220px;right:-150px;background:var(--primario);opacity:.1;"></div>
-<div class="glow" style="width:380px;height:380px;bottom:-140px;left:-100px;background:var(--secundario);opacity:.1;"></div>
-<div class="lbl an"><span class="pip"></span> Cierre · Canvas + Transmedia</div>
-<h2 class="tt an d1">El Canvas no es una tabla <em>—es <span class="hi">cómo la marca respira</span>.</em></h2>
-<p class="sub an d2" style="margin-bottom:18px;max-width:840px;">Los cinco bloques de esta entrega se conectan en un solo movimiento: <strong style="color:var(--primario);font-weight:700;">los aliados expanden la historia, las actividades la producen, las relaciones la sostienen, los costos la financian y los ingresos la vuelven sostenible</strong>. "Mi Casa Paso a Paso" funciona porque cada bloque cumple su rol sin pelearse con el otro.</p>
-<div class="g3 an d3">
-  <div class="card c-dark">
-    <div class="card-icon">🤝</div>
-    <span class="tag">Bloque 01</span>
-    <h4>Aliados expansivos</h4>
-    <p>6 categorías de aliados, ninguna casualidad. Cada uno suma una voz al universo —desde constructoras hasta @espaciosmate.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">⚙️</div>
-    <span class="tag">Bloque 02</span>
-    <h4>Actividades narrativas</h4>
-    <p>5 engranajes (curación, producción, gestión, métricas, co-creación) sincronizados con la parrilla de 60 contenidos.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">💬</div>
-    <span class="tag">Bloque 03</span>
-    <h4>Relaciones por etapa</h4>
-    <p>Pedagógica → guiada → humana → comunitaria para B2C. Autoridad → formal → demo → acompañamiento para B2B.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">💸</div>
-    <span class="tag">Bloque 04</span>
-    <h4>Costos coherentes</h4>
-    <p>$26.5–34M COP/Q3 con producción y talento como ejes. Showroom y semillero como palancas de eficiencia.</p>
-  </div>
-  <div class="card c-dark">
-    <div class="card-icon">💰</div>
-    <span class="tag">Bloque 05</span>
-    <h4>Ingresos sin candado</h4>
-    <p>Venta directa B2C modular + venta por volumen B2B + expansión internacional. Cero mensualidades, coherente con la propuesta.</p>
-  </div>
-  <div class="card c-green">
-    <div class="card-icon">🧭</div>
-    <span class="tag" style="background:rgba(255,255,255,.18);color:var(--blanco);">Cierre</span>
-    <h4>Mi Casa Paso a Paso</h4>
-    <p>El universo narrativo que conecta los cinco bloques. La historia que i-Homotic cuenta es también el modelo con el que opera.</p>
-  </div>
-</div>
-<div class="ft"><span>i-Homotic × EAFIT · Mercadeo Digital y Transmedia · 2026</span><div class="ft-r"><span style="color:rgba(255,255,255,.35);">Mateo · Ioav · Juan Camilo</span><span class="ft-pill">23 / 24</span></div></div>
-</section>
+  <!-- ═══ S12 · MÉTRICAS Y OPTIMIZACIÓN ═══ -->
+  <section class="s dk" id="s12">
+    <div class="strip sp"></div>
+    <div class="lbl an"><span class="pip"></span> Bloque 02 · Actividades #04 y #05</div>
+    <h2 class="tt an d1">Métricas, optimización <em>y co-creación con <span class="hi">aliados</span>.</em></h2>
+    <p class="sub an d2" style="margin-bottom:14px;">Sin estas dos actividades el universo se queda estático. La
+      medición permite iterar; la co-creación con aliados garantiza que la historia <strong
+        style="color:var(--primario);font-weight:700;">no dependa de un solo narrador</strong>.</p>
+    <div class="g2 an d3">
+      <div>
+        <div
+          style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--primario);font-weight:700;margin-bottom:9px;">
+          📊 Análisis y optimización</div>
+        <div class="ali">
+          <div class="ali-h">
+            <div class="ali-ic">📈</div>
+            <div>
+              <h5>Tablero semanal de KPIs</h5>
+            </div>
+          </div>
+          <p>24 indicadores divididos por etapa del embudo: 6 de atracción, 6 de consideración, 6 de conversión, 5 de
+            fidelización.</p>
+          <div class="ali-aport"><strong>Conexión transmedia:</strong> el contenido con peor rendimiento se reemplaza;
+            el de mejor rendimiento se amplifica con pauta.</div>
+        </div>
+        <div class="ali" style="margin-top:9px;">
+          <div class="ali-h">
+            <div class="ali-ic">🎯</div>
+            <div>
+              <h5>Reasignación de pauta</h5>
+            </div>
+          </div>
+          <p>El presupuesto de Meta Ads y LinkedIn Ads se concentra en las semanas 10-12 (Feria) y en piezas que ya
+            validaron orgánicamente.</p>
+          <div class="ali-aport"><strong>Conexión transmedia:</strong> la pauta amplifica lo que ya funciona, no rescata
+            lo que falla.</div>
+        </div>
+      </div>
+      <div>
+        <div
+          style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--secundario-l);font-weight:700;margin-bottom:9px;">
+          🤝 Co-creación con aliados</div>
+        <div class="ali pr">
+          <div class="ali-h">
+            <div class="ali-ic">🎙️</div>
+            <div>
+              <h5>Sesiones con arquitectos aliados</h5>
+            </div>
+          </div>
+          <p>1-2 entrevistas mensuales con Alex Toro, La Provenza o Peláez. Material para 1 post LinkedIn + 1 Reel + 1
+            Story por sesión.</p>
+          <div class="ali-aport"><strong>Adición narrativa:</strong> sus voces validan a Carlos. Sin esfuerzo de
+            producción adicional para ellos.</div>
+        </div>
+        <div class="ali pr" style="margin-top:9px;">
+          <div class="ali-h">
+            <div class="ali-ic">🏠</div>
+            <div>
+              <h5>Casos de seguimiento con propietarios</h5>
+            </div>
+          </div>
+          <p>Visitas a clientes a 6 meses de instalación. Una sola jornada de grabación genera contenido para 3 etapas
+            del embudo.</p>
+          <div class="ali-aport"><strong>Adición narrativa:</strong> familias reales hablando = la respuesta directa al
+            Insight 1 ("la confianza se googlea").</div>
+        </div>
+      </div>
+    </div>
+    <div class="ft"><span>Métricas + co-creación · El universo se ajusta solo si tiene oídos</span>
+      <div class="ft-r"><span class="ft-pill">12 / 24</span></div>
+    </div>
+  </section>
 
-<script>
-// Sidebar
-const sidebar=document.getElementById('sidebar');
-const overlay=document.getElementById('sidebarOverlay');
-const toggle=document.getElementById('sidebarToggle');
-const close=document.getElementById('sidebarClose');
-function openSb(){sidebar.classList.add('open');overlay.classList.add('show');}
-function closeSb(){sidebar.classList.remove('open');overlay.classList.remove('show');}
-toggle.addEventListener('click',openSb);
-close.addEventListener('click',closeSb);
-overlay.addEventListener('click',closeSb);
+  <!-- ═══ S13 · DIVIDER 03: RELACIONES ═══ -->
+  <section class="s dk" id="s13" style="align-items:center;text-align:center;">
+    <div class="bg-p"></div>
+    <div class="divn">03</div>
+    <div class="lbl an"><span class="pip"></span> Bloque 03</div>
+    <h2 class="tt an d1" style="font-size:clamp(2.4rem,5vw,3.8rem);">Relación con<br><em>los clientes 💬</em></h2>
+    <p class="sub an d2" style="text-align:center;max-width:760px;">Cada interacción cuenta una parte de la historia de
+      marca. Para el Explorador Informado, la relación es <strong style="color:var(--primario);font-weight:700;">una
+        conversación gradual</strong>; para Arturo González, una <strong
+        style="color:var(--secundario-l);font-weight:700;">demostración técnica acompañada</strong>.</p>
+    <div class="ft"><span>Relación con los clientes</span>
+      <div class="ft-r"><span class="ft-pill">13 / 24</span></div>
+    </div>
+  </section>
 
-// Sidebar links
-document.querySelectorAll('.sidebar-list a').forEach(a=>{
-  a.addEventListener('click',e=>{
-    document.querySelectorAll('.sidebar-list a').forEach(x=>x.classList.remove('active'));
-    a.classList.add('active');
-    setTimeout(closeSb,200);
-  });
-});
+  <!-- ═══ S14 · RELACIÓN B2C ═══ -->
+  <section class="s dk" id="s14">
+    <div class="strip sg"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
+      <div>
+        <div class="lbl an"><span class="pip"></span> Bloque 03 · B2C</div>
+        <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Una relación <span class="hi">paso a
+            paso</span>, como compra el Explorador Informado</h2>
+      </div>
+      <div class="aud b2c an d1">Marcela Ríos · Eliana Restrepo · 30-55 años</div>
+    </div>
+    <p class="sub an d2" style="margin-bottom:14px;">El Explorador Informado no quiere ser perseguido. Quiere <strong
+        style="color:var(--primario);font-weight:700;">descubrir, validar, expandir</strong>. La relación debe acompañar
+      ese ritmo: presencia abundante en la fase de investigación, sutileza en la consideración, calidez humana al
+      cerrar.</p>
+    <div class="g3 an d3">
+      <div class="card c-dark">
+        <div class="card-icon">🌱</div>
+        <span class="tag">Tipo · Masiva pedagógica</span>
+        <h4>Atracción — Instagram + Shorts</h4>
+        <p>Voz del Sabio y del Cuidador. No vendemos: enseñamos. Cada Reel responde una pregunta que ya escribió en
+          Google ("¿sube el recibo?", "¿toca romper paredes?").</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">🔍</div>
+        <span class="tag">Tipo · Auto-servicio guiado</span>
+        <h4>Consideración — Sitio web + carruseles</h4>
+        <p>Calculadora de ahorro, configurador modular, antes/después. El usuario navega solo; no le exigimos formulario
+          para "verla funcionar".</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">🤝</div>
+        <span class="tag">Tipo · Personalizada humana</span>
+        <h4>Conversión — WhatsApp con Carlos</h4>
+        <p>Sin chatbots. Carlos en persona responde la cotización. El cierre se hace en showroom: ver, tocar, probar. La
+          familia decide junta.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">💚</div>
+        <span class="tag">Tipo · Comunidad cálida</span>
+        <h4>Fidelización — WhatsApp Canal</h4>
+        <p>Tips de escena, audios de Carlos, invitaciones exclusivas. Espacio íntimo de quien ya dio el primer paso.
+          Conversión a embajador.</p>
+      </div>
+    </div>
+    <div class="stmt st-green an d4" style="margin-top:16px;">
+      Insight clave para el equipo de comunicación: <strong>el Explorador Informado prefiere "encontrar" antes que "ser
+        encontrado"</strong>. Una pauta agresiva lo aleja; un Reel pedagógico que cura su duda exacta lo invita a entrar
+      al universo por su propia cuenta.
+    </div>
+    <div class="ft"><span>Relación B2C · El cliente fija el ritmo</span>
+      <div class="ft-r"><span class="ft-pill">14 / 24</span></div>
+    </div>
+  </section>
 
-// Nav dots
-const slides=document.querySelectorAll('.s');
-const nav=document.getElementById('nav');
-slides.forEach((s,i)=>{
-  const d=document.createElement('div');
-  d.className='dt';
-  d.dataset.idx=i;
-  d.addEventListener('click',()=>slides[i].scrollIntoView({behavior:'smooth'}));
-  nav.appendChild(d);
-});
-const dots=document.querySelectorAll('.dt');
-const sbItems=document.querySelectorAll('.sidebar-list a');
+  <!-- ═══ S15 · RELACIÓN B2B ═══ -->
+  <section class="s dk" id="s15">
+    <div class="strip sp"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
+      <div>
+        <div class="lbl an"><span class="pip"></span> Bloque 03 · B2B</div>
+        <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Una relación <span class="hi">técnica y
+            formal</span>, con el ritmo de Arturo González</h2>
+      </div>
+      <div class="aud b2b an d1">Arturo González · Director de Innovación</div>
+    </div>
+    <p class="sub an d2" style="margin-bottom:14px;">Arturo no compra por impulso. Compra por <strong
+        style="color:var(--primario);font-weight:700;">ROI demostrable y respaldo formal</strong>. La relación es de
+      socio técnico: i-Homotic le entrega un diferencial competitivo para sus proyectos sin romper sus márgenes.</p>
+    <div class="g3 an d3">
+      <div class="card c-darker">
+        <div class="card-icon" style="color:var(--secundario-l);">📊</div>
+        <span class="tag" style="background:rgba(123,90,162,.18);color:var(--secundario-l);">Tipo · Autoridad
+          técnica</span>
+        <h4>Atracción — LinkedIn</h4>
+        <p>Datos del mercado smart home colombiano, certificaciones EDGE/LEED, casos de uso. Posts que pueda compartir
+          con su gerente.</p>
+      </div>
+      <div class="card c-darker">
+        <div class="card-icon" style="color:var(--secundario-l);">📂</div>
+        <span class="tag" style="background:rgba(123,90,162,.18);color:var(--secundario-l);">Tipo · Material
+          formal</span>
+        <h4>Consideración — Fichas y casos</h4>
+        <p>PDF descargables con especificaciones, ROI por unidad, garantías. Material que pueda llevar a comité
+          directivo.</p>
+      </div>
+      <div class="card c-darker">
+        <div class="card-icon" style="color:var(--secundario-l);">🤝</div>
+        <span class="tag" style="background:rgba(123,90,162,.18);color:var(--secundario-l);">Tipo · Demo agendada</span>
+        <h4>Conversión — Showroom + reunión</h4>
+        <p>Demos técnicas de 15 o 45 min en showroom. Carlos explica la integración con planos eléctricos del proyecto.
+          Propuesta formal por escrito.</p>
+      </div>
+      <div class="card c-darker">
+        <div class="card-icon" style="color:var(--secundario-l);">🔁</div>
+        <span class="tag" style="background:rgba(123,90,162,.18);color:var(--secundario-l);">Tipo ·
+          Acompañamiento</span>
+        <h4>Fidelización — Proyectos repetidos</h4>
+        <p>Carlos como acompañante permanente del proyecto. Soporte postventa que reduce el riesgo de queja del
+          comprador final.</p>
+      </div>
+    </div>
+    <div class="stmt st-purple an d4" style="margin-top:16px;">
+      Diferencia crítica con B2C: <strong>el ciclo de decisión es largo (fase de diseño del proyecto, no
+        después)</strong> y la relación se sostiene antes, durante y después de la venta. La fidelización B2B no es
+      contenido —es resultado en obra.
+    </div>
+    <div class="ft"><span>Relación B2B · Socio técnico, no proveedor</span>
+      <div class="ft-r"><span class="ft-pill">15 / 24</span></div>
+    </div>
+  </section>
 
-// Active observer
-const io=new IntersectionObserver((entries)=>{
-  entries.forEach(en=>{
-    if(en.isIntersecting){
-      const idx=[...slides].indexOf(en.target);
-      dots.forEach(d=>d.classList.remove('on'));
-      dots[idx]?.classList.add('on');
-      sbItems.forEach(x=>x.classList.remove('active'));
-      sbItems[idx]?.classList.add('active');
-      // Trigger animations
-      en.target.querySelectorAll('.an').forEach(el=>{
-        el.style.animationPlayState='running';
+  <!-- ═══ S16 · EMBUDO Y NARRATIVA ═══ -->
+  <section class="s dk" id="s16">
+    <div class="strip sb"></div>
+    <div class="lbl an"><span class="pip"></span> Bloque 03 · Síntesis</div>
+    <h2 class="tt an d1">Cada etapa del embudo <em>cuenta <span class="hi">una parte distinta</span> de la
+        historia.</em></h2>
+    <p class="sub an d2" style="margin-bottom:14px;">Esta tabla resume cómo cambia la relación —y la voz— por etapa,
+      para los dos públicos. <strong style="color:var(--primario);font-weight:700;">Atracción es alcance; fidelización
+        es comunidad.</strong> El contenido y la voz cambian, pero el universo es el mismo.</p>
+    <div class="fnl an d3">
+      <div class="fnl-h">Etapa</div>
+      <div class="fnl-h">Relación B2C — Marcela / Eliana</div>
+      <div class="fnl-h">Relación B2B — Arturo</div>
+
+      <div class="fnl-row">
+        <div class="stage">Atracción<span class="pct">45 %</span></div>
+        <div class="b2c-cell"><strong>Pedagógica masiva.</strong> Reels FAQ y carruseles que responden búsquedas en
+          Google. Sin pedir nada a cambio.</div>
+        <div class="b2b-cell"><strong>Autoridad técnica.</strong> Posts en LinkedIn con datos verificables del sector.
+          Material descargable.</div>
+      </div>
+      <div class="fnl-row">
+        <div class="stage">Consideración<span class="pct">30 %</span></div>
+        <div class="b2c-cell"><strong>Auto-servicio visual.</strong> Sitio web con calculadora, antes/después,
+          testimonios. Tiempo en sitio &gt;1:30 min.</div>
+        <div class="b2b-cell"><strong>Diálogo formal.</strong> Casos de estudio con ROI, fichas técnicas en PDF y
+          entrevistas con arquitectos aliados.</div>
+      </div>
+      <div class="fnl-row">
+        <div class="stage">Conversión<span class="pct">15 %</span></div>
+        <div class="b2c-cell"><strong>Humana directa.</strong> WhatsApp con Carlos. Demo en showroom. La familia decide
+          junta tras visita.</div>
+        <div class="b2b-cell"><strong>Demo técnica agendada.</strong> 15 o 45 min en showroom. Propuesta escrita con
+          integración a planos del proyecto.</div>
+      </div>
+      <div class="fnl-row">
+        <div class="stage">Fidelización<span class="pct">10 %</span></div>
+        <div class="b2c-cell"><strong>Comunidad íntima.</strong> WhatsApp Canal con audios de Carlos, tips de escena,
+          invitaciones exclusivas a Feria.</div>
+        <div class="b2b-cell"><strong>Socio recurrente.</strong> Acompañamiento permanente. Postventa que asegura
+          siguientes proyectos del mismo cliente.</div>
+      </div>
+    </div>
+    <div class="ft"><span>Embudo narrativo · Una historia, dos lecturas</span>
+      <div class="ft-r"><span class="ft-pill">16 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S17 · DIVIDER 04: COSTOS ═══ -->
+  <section class="s dk" id="s17" style="align-items:center;text-align:center;">
+    <div class="bg-p"></div>
+    <div class="divn">04</div>
+    <div class="lbl an"><span class="pip"></span> Bloque 04</div>
+    <h2 class="tt an d1" style="font-size:clamp(2.4rem,5vw,3.8rem);">Estructura<br><em>de costos 💸</em></h2>
+    <p class="sub an d2" style="text-align:center;max-width:760px;">Estimación de los costos de la <strong
+        style="color:var(--primario);font-weight:700;">estrategia transmedia Q3 2026</strong> —no los del negocio
+      entero. Cinco grandes categorías con peso relativo y rangos en COP por trimestre.</p>
+    <div class="ft"><span>Estructura de costos</span>
+      <div class="ft-r"><span class="ft-pill">17 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S18 · DISTRIBUCIÓN COSTOS ═══ -->
+  <section class="s dk" id="s18">
+    <div class="strip sg"></div>
+    <div class="lbl an"><span class="pip"></span> Bloque 04 · Distribución Q3 2026</div>
+    <h2 class="tt an d1">Cinco frentes de inversión <em>—la mayoría<br>en <span class="hi">producción y
+          talento</span>.</em></h2>
+    <p class="sub an d2" style="margin-bottom:14px;">Estos rangos asumen un equipo de 3 estudiantes EAFIT + Carlos +
+      apoyos puntuales. El equipo de producción y la propiedad del showroom <strong
+        style="color:var(--primario);font-weight:700;">reducen significativamente los costos</strong> respecto a
+      contratar una agencia externa.</p>
+    <div class="an d3" style="margin-top:6px;">
+      <div class="cb">
+        <div class="cb-lbl"><span class="ic">🎬</span> Producción audiovisual y diseño</div>
+        <div class="cb-bar">
+          <div class="cb-fill f1" style="width:35%;">35 %</div>
+        </div>
+        <div class="cb-val">$10–12M COP</div>
+      </div>
+      <div class="cb">
+        <div class="cb-lbl"><span class="ic">👥</span> Personal y honorarios</div>
+        <div class="cb-bar">
+          <div class="cb-fill f2" style="width:25%;">25 %</div>
+        </div>
+        <div class="cb-val">$7–9M COP</div>
+      </div>
+      <div class="cb">
+        <div class="cb-lbl"><span class="ic">📣</span> Pauta digital (Meta + LinkedIn + Google)</div>
+        <div class="cb-bar">
+          <div class="cb-fill f3" style="width:20%;">20 %</div>
+        </div>
+        <div class="cb-val">$5–7M COP</div>
+      </div>
+      <div class="cb">
+        <div class="cb-lbl"><span class="ic">🎪</span> Activación física · Feria del Diseño</div>
+        <div class="cb-bar">
+          <div class="cb-fill f4" style="width:13%;">13 %</div>
+        </div>
+        <div class="cb-val">$3–4M COP</div>
+      </div>
+      <div class="cb">
+        <div class="cb-lbl"><span class="ic">🛠️</span> Herramientas y plataformas digitales</div>
+        <div class="cb-bar">
+          <div class="cb-fill f5" style="width:7%;">7 %</div>
+        </div>
+        <div class="cb-val">$1.5–2M COP</div>
+      </div>
+    </div>
+    <div class="cost-sum an d4" style="margin-top:14px;">
+      <div>
+        <div class="cs-lbl">Inversión total estimada Q3 2026</div>
+        <div class="cs-val">$26.5 – 34 M COP</div>
+      </div>
+      <div class="cs-note">Estimación trimestral —no anual. Excluye costos operativos del negocio (hardware,
+        instalación, oficina, soporte técnico postventa) que ya están cubiertos por el flujo de caja existente de
+        GELECT.</div>
+    </div>
+    <div class="ft"><span>Distribución de inversión Q3 2026</span>
+      <div class="ft-r"><span class="ft-pill">18 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S19 · OPTIMIZACIÓN ═══ -->
+  <section class="s dk" id="s19">
+    <div class="strip sg"></div>
+    <div class="lbl an"><span class="pip"></span> Bloque 04 · Optimización</div>
+    <h2 class="tt an d1">Cuáles costos <em>son críticos —y cómo <span class="hi">optimizarlos</span>.</em></h2>
+    <p class="sub an d2" style="margin-bottom:14px;">La mayor palanca de eficiencia es <strong
+        style="color:var(--primario);font-weight:700;">producir con activos propios</strong>: showroom como locación,
+      equipo del semillero EAFIT como talento, librería propia como reemplazo de SDKs pagos.</p>
+    <div class="g3 an d3">
+      <div class="card c-dark">
+        <div class="card-icon">🎬</div>
+        <span class="tag">Costo crítico #1</span>
+        <h4>Producción audiovisual</h4>
+        <p>Cámara, audio, edición de 60 piezas + cobertura de Feria. <strong
+            style="color:var(--primario);">Optimización:</strong> showroom como locación recurrente + repurposing (1
+          grabación = 4-5 piezas).</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">📣</div>
+        <span class="tag">Costo crítico #2</span>
+        <h4>Pauta digital concentrada</h4>
+        <p>Meta + LinkedIn + Google Ads. <strong style="color:var(--primario);">Optimización:</strong> 70% de la pauta
+          entre semanas 9-12 (Feria + cierre Q3). Pauta solo sobre piezas ya validadas orgánicamente.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">🎪</div>
+        <span class="tag">Costo crítico #3</span>
+        <h4>Stand Feria del Diseño</h4>
+        <p>3 días en Plaza Mayor + material POP + adecuación. <strong
+            style="color:var(--primario);">Optimización:</strong> productos del showroom como stand modular + brochures
+          impresos en cantidades calculadas (no excedente).</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">👥</div>
+        <span class="tag">Optimización transversal</span>
+        <h4>Talento del semillero EAFIT</h4>
+        <p>Equipo Mateo + Ioav + Juan Camilo como base de producción. <strong
+            style="color:var(--primario);">Beneficio:</strong> 60-70% del costo que tendría una agencia mediana en
+          Medellín.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">🏠</div>
+        <span class="tag">Optimización transversal</span>
+        <h4>Showroom como activo dual</h4>
+        <p>Mismo espacio sirve como <strong style="color:var(--primario);">(1)</strong> locación de grabación, <strong
+            style="color:var(--primario);">(2)</strong> punto de demo B2B, <strong
+            style="color:var(--primario);">(3)</strong> contenido de Reels recurrente.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">⚙️</div>
+        <span class="tag">Optimización transversal</span>
+        <h4>Librería propia (no SDK)</h4>
+        <p>i-Homotic desarrolló su propia comunicación con Alexa/Google/Siri. <strong
+            style="color:var(--primario);">Beneficio:</strong> cero pago de licencias recurrentes, lo cual también es la
+          propuesta de valor.</p>
+      </div>
+    </div>
+    <div class="ft"><span>Optimización · Eficiencia es coherencia con la propuesta</span>
+      <div class="ft-r"><span class="ft-pill">19 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S20 · DIVIDER 05: INGRESOS ═══ -->
+  <section class="s dk" id="s20" style="align-items:center;text-align:center;">
+    <div class="bg-p"></div>
+    <div class="divn">05</div>
+    <div class="lbl an"><span class="pip"></span> Bloque 05</div>
+    <h2 class="tt an d1" style="font-size:clamp(2.4rem,5vw,3.8rem);">Fuentes<br><em>de ingresos 💰</em></h2>
+    <p class="sub an d2" style="text-align:center;max-width:760px;">Cómo i-Homotic <strong
+        style="color:var(--primario);font-weight:700;">captura valor económico</strong> a través de venta directa B2C,
+      alianzas B2B y expansión internacional. Sin mensualidades. Sin SaaS. Sin dependencias recurrentes.</p>
+    <div class="ft"><span>Fuentes de ingresos</span>
+      <div class="ft-r"><span class="ft-pill">20 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S21 · INGRESOS B2C ═══ -->
+  <section class="s dk" id="s21">
+    <div class="strip sg"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
+      <div>
+        <div class="lbl an"><span class="pip"></span> Bloque 05 · B2C</div>
+        <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Venta directa <span class="hi">paso a
+            paso</span>—como compra el Explorador Informado</h2>
+      </div>
+      <div class="aud b2c an d1">B2C · Marcela Ríos</div>
+    </div>
+    <p class="sub an d2" style="margin-bottom:14px;">El comportamiento de compra del usuario (validar, probar, expandir)
+      define el modelo de ingreso: <strong style="color:var(--primario);font-weight:700;">paquetes modulares por
+        habitación o por función</strong>, no contratos cerrados ni mensualidades. El cliente paga una sola vez por
+      etapa y vuelve cuando quiere expandir.</p>
+    <div class="g3 an d3">
+      <div class="rev">
+        <div class="rev-h">
+          <div class="rev-ic">💡</div>
+          <div>
+            <div class="rev-cat">Punto de entrada</div>
+            <h5>Paquete por función</h5>
+          </div>
+        </div>
+        <div class="rev-amt">$3 – 8M COP</div>
+        <p>Iluminación inteligente o clima o seguridad — uno solo, instalado. Es el "primer paso" al que invita la
+          narrativa transmedia.</p>
+      </div>
+      <div class="rev">
+        <div class="rev-h">
+          <div class="rev-ic">🏠</div>
+          <div>
+            <div class="rev-cat">Apartamento integral</div>
+            <h5>Paquete por habitación o casa</h5>
+          </div>
+        </div>
+        <div class="rev-amt">$15 – 40M COP</div>
+        <p>Iluminación + clima + seguridad + escenas. El paquete clásico para el cliente que ya validó la marca y compra
+          todo de una vez.</p>
+      </div>
+      <div class="rev">
+        <div class="rev-h">
+          <div class="rev-ic">📦</div>
+          <div>
+            <div class="rev-cat">Expansión gradual</div>
+            <h5>Dispositivos sueltos</h5>
+          </div>
+        </div>
+        <div class="rev-amt">$200K – 2M COP</div>
+        <p>Switches, sensores, cámaras adicionales. El cliente que ya tiene iluminación vuelve por seguridad. Recompra
+          sin mensualidad.</p>
+      </div>
+      <div class="rev">
+        <div class="rev-h">
+          <div class="rev-ic">🔧</div>
+          <div>
+            <div class="rev-cat">Servicio</div>
+            <h5>Instalación y capacitación</h5>
+          </div>
+        </div>
+        <div class="rev-amt">$500K – 3M COP</div>
+        <p>Cableado UTP de bajo voltaje, programación de escenas, capacitación a la familia. Se incluye en paquete o se
+          vende por hora.</p>
+      </div>
+      <div class="rev">
+        <div class="rev-h">
+          <div class="rev-ic">⚡</div>
+          <div>
+            <div class="rev-cat">Add-on sostenibilidad</div>
+            <h5>Integración con energía solar</h5>
+          </div>
+        </div>
+        <div class="rev-amt">$2 – 5M COP</div>
+        <p>Para hogares que ya tienen paneles (o piensan instalarlos). La domótica de 12-24V se conecta directo sin
+          transformadores.</p>
+      </div>
+      <div class="rev">
+        <div class="rev-h">
+          <div class="rev-ic">🛟</div>
+          <div>
+            <div class="rev-cat">Postventa</div>
+            <h5>Soporte premium opcional</h5>
+          </div>
+        </div>
+        <div class="rev-amt">$300K – 800K COP/año</div>
+        <p>Soporte priorizado (no obligatorio, no mensual). Coherente con el principio de "cero costos recurrentes" como
+          diferencial.</p>
+      </div>
+    </div>
+    <div class="ft"><span>Ingresos B2C · Sin mensualidades, sin SaaS, sin candado</span>
+      <div class="ft-r"><span class="ft-pill">21 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S22 · INGRESOS B2B + EXPANSIÓN ═══ -->
+  <section class="s dk" id="s22">
+    <div class="strip sp"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:14px;">
+      <div>
+        <div class="lbl an"><span class="pip"></span> Bloque 05 · B2B + Expansión</div>
+        <h2 class="tt an d1" style="font-size:clamp(1.3rem,2.6vw,1.85rem);">Volumen, prescripción y <span
+            class="hi">mercado internacional</span></h2>
+      </div>
+      <div class="aud b2b an d1">B2B · Arturo González</div>
+    </div>
+    <p class="sub an d2" style="margin-bottom:14px;">El B2B no replica el B2C: <strong
+        style="color:var(--primario);font-weight:700;">aquí se venden volúmenes con precio diferenciado</strong> y la
+      fidelización vale más que el ticket inicial. La expansión internacional es la apuesta de mayor potencial: el
+      switch i-Homotic cuesta 25 USD vs. 87 USD en EE.UU.</p>
+    <div class="g2 an d3">
+      <div>
+        <div
+          style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--secundario-l);font-weight:700;margin-bottom:9px;">
+          🏗️ Modelos B2B</div>
+        <div class="rev pr">
+          <div class="rev-h">
+            <div class="rev-ic">🏢</div>
+            <div>
+              <div class="rev-cat">Núcleo B2B</div>
+              <h5>Venta por volumen a constructoras</h5>
+            </div>
+          </div>
+          <div class="rev-amt">$50M – $500M COP/proyecto</div>
+          <p>Paquetes de 50+ unidades preinstaladas. Precio unitario menor, ticket total mucho mayor. Carlos coordina
+            con departamento eléctrico de la constructora.</p>
+        </div>
+        <div class="rev pr" style="margin-top:9px;">
+          <div class="rev-h">
+            <div class="rev-ic">📐</div>
+            <div>
+              <div class="rev-cat">Prescripción</div>
+              <h5>Comisión por arquitecto referenciador</h5>
+            </div>
+          </div>
+          <div class="rev-amt">5 – 10 % del proyecto</div>
+          <p>Firmas como Alex Toro, Peláez o La Provenza reciben comisión sobre proyectos cerrados gracias a su
+            prescripción. Modelo de incentivo mutuo.</p>
+        </div>
+        <div class="rev pr" style="margin-top:9px;">
+          <div class="rev-h">
+            <div class="rev-ic">🎓</div>
+            <div>
+              <div class="rev-cat">Servicio asociado</div>
+              <h5>Capacitación a fuerza de ventas</h5>
+            </div>
+          </div>
+          <div class="rev-amt">$2 – 5M COP/sesión</div>
+          <p>i-Homotic capacita a los vendedores de la constructora para que sepan vender "apartamento domótico" como
+            diferencial.</p>
+        </div>
+      </div>
+      <div>
+        <div
+          style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--primario);font-weight:700;margin-bottom:9px;">
+          🌎 Expansión internacional</div>
+        <div class="rev">
+          <div class="rev-h">
+            <div class="rev-ic">🇺🇸</div>
+            <div>
+              <div class="rev-cat">Exportación · Activo</div>
+              <h5>Constructora en Orlando (Miami)</h5>
+            </div>
+          </div>
+          <div class="rev-amt">Margen ~3× COP local</div>
+          <p>Contacto activo con constructora en Orlando. La ventaja de precio es real: switch de i-Homotic ≈ 25 USD vs
+            87 USD en mercado estadounidense.</p>
+        </div>
+        <div class="rev" style="margin-top:9px;">
+          <div class="rev-h">
+            <div class="rev-ic">🌉</div>
+            <div>
+              <div class="rev-cat">Exploración</div>
+              <h5>Interesado en San Francisco</h5>
+            </div>
+          </div>
+          <div class="rev-amt">Por explorar</div>
+          <p>Contacto inicial sin proyecto formal. Requiere consolidar primero presencia digital robusta antes de
+            avanzar (responde directamente al Insight 1).</p>
+        </div>
+        <div class="rev" style="margin-top:9px;">
+          <div class="rev-h">
+            <div class="rev-ic">🏷️</div>
+            <div>
+              <div class="rev-cat">Futuro · Long-tail</div>
+              <h5>Licenciamiento / White-label</h5>
+            </div>
+          </div>
+          <div class="rev-amt">Por modelar</div>
+          <p>Posibilidad de licenciar el firmware y la librería a empresas locales de otros países que ensamblan su
+            propio hardware. Modelo de royalty.</p>
+        </div>
+      </div>
+    </div>
+    <div class="ft"><span>Ingresos B2B + expansión · El verdadero múltiplo del modelo</span>
+      <div class="ft-r"><span class="ft-pill">22 / 24</span></div>
+    </div>
+  </section>
+
+  <!-- ═══ S23 · CIERRE CANVAS + TRANSMEDIA ═══ -->
+  <section class="s nv" id="s23">
+    <div class="grid-bg"></div>
+    <div class="glow" style="width:520px;height:520px;top:-220px;right:-150px;background:var(--primario);opacity:.1;">
+    </div>
+    <div class="glow"
+      style="width:380px;height:380px;bottom:-140px;left:-100px;background:var(--secundario);opacity:.1;"></div>
+    <div class="lbl an"><span class="pip"></span> Cierre · Canvas + Transmedia</div>
+    <h2 class="tt an d1">El Canvas no es una tabla <em>—es <span class="hi">cómo la marca respira</span>.</em></h2>
+    <p class="sub an d2" style="margin-bottom:18px;max-width:840px;">Los cinco bloques de esta entrega se conectan en un
+      solo movimiento: <strong style="color:var(--primario);font-weight:700;">los aliados expanden la historia, las
+        actividades la producen, las relaciones la sostienen, los costos la financian y los ingresos la vuelven
+        sostenible</strong>. "Mi Casa Paso a Paso" funciona porque cada bloque cumple su rol sin pelearse con el otro.
+    </p>
+    <div class="g3 an d3">
+      <div class="card c-dark">
+        <div class="card-icon">🤝</div>
+        <span class="tag">Bloque 01</span>
+        <h4>Aliados expansivos</h4>
+        <p>6 categorías de aliados, ninguna casualidad. Cada uno suma una voz al universo —desde constructoras hasta
+          @espaciosmate.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">⚙️</div>
+        <span class="tag">Bloque 02</span>
+        <h4>Actividades narrativas</h4>
+        <p>5 engranajes (curación, producción, gestión, métricas, co-creación) sincronizados con la parrilla de 60
+          contenidos.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">💬</div>
+        <span class="tag">Bloque 03</span>
+        <h4>Relaciones por etapa</h4>
+        <p>Pedagógica → guiada → humana → comunitaria para B2C. Autoridad → formal → demo → acompañamiento para B2B.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">💸</div>
+        <span class="tag">Bloque 04</span>
+        <h4>Costos coherentes</h4>
+        <p>$26.5–34M COP/Q3 con producción y talento como ejes. Showroom y semillero como palancas de eficiencia.</p>
+      </div>
+      <div class="card c-dark">
+        <div class="card-icon">💰</div>
+        <span class="tag">Bloque 05</span>
+        <h4>Ingresos sin candado</h4>
+        <p>Venta directa B2C modular + venta por volumen B2B + expansión internacional. Cero mensualidades, coherente
+          con la propuesta.</p>
+      </div>
+      <div class="card c-green">
+        <div class="card-icon">🧭</div>
+        <span class="tag" style="background:rgba(255,255,255,.18);color:var(--blanco);">Cierre</span>
+        <h4>Mi Casa Paso a Paso</h4>
+        <p>El universo narrativo que conecta los cinco bloques. La historia que i-Homotic cuenta es también el modelo
+          con el que opera.</p>
+      </div>
+    </div>
+    <div class="ft"><span>i-Homotic × EAFIT · Mercadeo Digital y Transmedia · 2026</span>
+      <div class="ft-r"><span style="color:rgba(255,255,255,.35);">Mateo · Ioav · Juan Camilo</span><span
+          class="ft-pill">23 / 24</span></div>
+    </div>
+  </section>
+
+  <script>
+    // Sidebar
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const toggle = document.getElementById('sidebarToggle');
+    const close = document.getElementById('sidebarClose');
+    function openSb() { sidebar.classList.add('open'); overlay.classList.add('show'); }
+    function closeSb() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+    toggle.addEventListener('click', openSb);
+    close.addEventListener('click', closeSb);
+    overlay.addEventListener('click', closeSb);
+
+    // Sidebar links
+    document.querySelectorAll('.sidebar-list a').forEach(a => {
+      a.addEventListener('click', e => {
+        document.querySelectorAll('.sidebar-list a').forEach(x => x.classList.remove('active'));
+        a.classList.add('active');
+        setTimeout(closeSb, 200);
       });
-    }
-  });
-},{threshold:.4});
-slides.forEach(s=>io.observe(s));
+    });
 
-// Keyboard nav
-document.addEventListener('keydown',(e)=>{
-  const cur=[...dots].findIndex(d=>d.classList.contains('on'));
-  if(e.key==='ArrowDown'||e.key==='PageDown'){slides[Math.min(cur+1,slides.length-1)]?.scrollIntoView({behavior:'smooth'});}
-  if(e.key==='ArrowUp'||e.key==='PageUp'){slides[Math.max(cur-1,0)]?.scrollIntoView({behavior:'smooth'});}
-});
-</script>
+    // Nav dots
+    const slides = document.querySelectorAll('.s');
+    const nav = document.getElementById('nav');
+    slides.forEach((s, i) => {
+      const d = document.createElement('div');
+      d.className = 'dt';
+      d.dataset.idx = i;
+      d.addEventListener('click', () => slides[i].scrollIntoView({ behavior: 'smooth' }));
+      nav.appendChild(d);
+    });
+    const dots = document.querySelectorAll('.dt');
+    const sbItems = document.querySelectorAll('.sidebar-list a');
+
+    // Active observer
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          const idx = [...slides].indexOf(en.target);
+          dots.forEach(d => d.classList.remove('on'));
+          dots[idx]?.classList.add('on');
+          sbItems.forEach(x => x.classList.remove('active'));
+          sbItems[idx]?.classList.add('active');
+          // Trigger animations
+          en.target.querySelectorAll('.an').forEach(el => {
+            el.style.animationPlayState = 'running';
+          });
+        }
+      });
+    }, { threshold: .4 });
+    slides.forEach(s => io.observe(s));
+
+    // Keyboard nav
+    document.addEventListener('keydown', (e) => {
+      const cur = [...dots].findIndex(d => d.classList.contains('on'));
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') { slides[Math.min(cur + 1, slides.length - 1)]?.scrollIntoView({ behavior: 'smooth' }); }
+      if (e.key === 'ArrowUp' || e.key === 'PageUp') { slides[Math.max(cur - 1, 0)]?.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  </script>
 </body>
+
 </html>
